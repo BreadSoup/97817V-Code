@@ -5,6 +5,7 @@
 #include "pros/rtos.h"
 
 inline void auton(){
+    /*
     piston.set_value(false);
     drivetrain.move(-50);
     pros::c::delay(850);
@@ -19,6 +20,7 @@ inline void auton(){
     pros:pros::c::delay(500);
     Redriect.move_voltage(0);
     drivetrain.move_voltage(0);
+    */
 }
 
 #endif

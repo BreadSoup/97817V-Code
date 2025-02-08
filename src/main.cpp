@@ -1,5 +1,6 @@
 // main.cpp g
 #include "main.h"
+#include "lemlib/chassis/trackingWheel.hpp"
 #include "pros/misc.h"
 
 #include "Brain/BrainScreen.h"
@@ -9,7 +10,240 @@
 #include "DriverControl/redirect.h"
 #include "DriverControl/auton.h"
 #include "pros/screen.hpp"
+#include "lemlib/api.hpp" 
+
 //#include "pros/motor_group.hpp"
+
+ASSET(bluestep2_txt); 
+ASSET(red2_txt); 
+ASSET(red3_txt); 
+
+
+ASSET(bluestep5_txt);
+ASSET(bluestep7_txt); 
+ASSET(drakept1_txt);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+pros::Imu imu(8); 
+pros::MotorGroup leftm({-18, -17, -13});
+pros::MotorGroup rightm({15, 19, 9});
+
+// ---------------------- LemLib Setup ----------------------
+
+lemlib::Drivetrain yah(&leftm, // left motor group
+                              &rightm, // right motor group
+                              12.5, // 10 inch track width
+                              lemlib::Omniwheel::NEW_325_HALF, // using new 4" omnis
+                              450, // drivetrain rpm is 360
+                              2 // horizontal drift is 2. If we had traction wheels, it would have been 8
+);
+lemlib::ControllerSettings linearController(10, // proportional gain (kP)
+                                            0, // integral gain (kI)
+                                            3, // derivative gain (kD)
+                                            3, // anti windup
+                                            1, // small error range, in inches
+                                            100, // small error range timeout, in milliseconds
+                                            3, // large error range, in inches
+                                            500, // large error range timeout, in milliseconds
+                                            20 // maximum acceleration (slew)
+);
+
+// angular motion controller
+lemlib::ControllerSettings angularController(2, // proportional gain (kP)
+                                             0, // integral gain (kI)
+                                             10, // derivative gain (kD)
+                                             3, // anti windup
+                                             1, // small error range, in degrees
+                                             100, // small error range timeout, in milliseconds
+                                             3, // large error range, in degrees
+                                             500, // large error range timeout, in milliseconds
+                                             0 // maximum acceleration (slew)
+);
+
+// sensors for odometry
+lemlib::OdomSensors sensors(nullptr, 
+                            nullptr, 
+                            nullptr,
+                            nullptr, 
+                            &imu // inertial sensor
+);
+
+
+
+lemlib::Chassis chassis(yah, linearController, angularController, sensors);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 LV_IMG_DECLARE(awesome);
 lv_obj_t* awesome_obj = NULL;
@@ -45,6 +279,27 @@ void initialize() {
 	Redriect.set_gearing(pros::E_MOTOR_GEAR_BLUE);
 	intializePneumatics();
 	//encoder.reset();
+
+
+	pros::lcd::initialize(); // initialize brain screen
+    chassis.calibrate();     // calibrate sensors
+
+
+  //  pros::lcd::clear();
+
+    // thread to for brain screen and position logging
+     pros::Task screenTask([&]() {
+      while (true) {
+           // print robot location to the brain screen
+           pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
+           pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
+           pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+           // log position telemetry
+           lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
+           // delay to save resources
+           pros::delay(50);
+
+      }});
 }
 
 /**
@@ -77,7 +332,120 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	auton();
+	//auton();
+
+
+
+
+
+
+
+
+
+
+    chassis.setPose({55.076, -22.386, 0}); 
+       //  chassis.moveToPoint(-14, -41.356, 5000, { .forwards = true, .maxSpeed = 65 });
+
+
+
+
+
+
+
+    
+// grab mogo
+    chassis.follow(drakept1_txt, 15, 2000, true); 
+
+	chassis.turnToHeading(-90, 2000, { .maxSpeed = 40 });
+	chassis.moveToPoint(64.651, 0, 2000, { .forwards = false, .maxSpeed = 40 });
+
+	pros::delay(800);
+	chassis.waitUntilDone();
+	lift.move(127);
+	pros::delay(750);
+	chassis.moveToPoint(60.651, 0, 2000, { .forwards = false, .maxSpeed = 60 });
+
+	// intake herer yahhhhh
+	chassis.turnToPoint(28.848, -20.513, 2000, { .forwards = false, .maxSpeed = 50 });
+
+	chassis.moveToPoint(28.848, -20.513, 3000, { .forwards = false, .maxSpeed = 45 });
+
+	chassis.waitUntilDone();
+	piston.set_value(true);
+	pros::delay(700);
+
+
+	// clamp mogo
+
+	chassis.turnToPoint(26.8, -46.948, 1000, { .forwards = true, .maxSpeed = 60 });
+	pros::delay(300);
+
+	chassis.moveToPoint(26.8, -46.948, 3000, { .forwards = true, .maxSpeed = 60 });
+	pros::delay(800);
+
+	chassis.waitUntilDone();
+
+	chassis.turnToPoint(23.02, 0, 2000);
+	chassis.moveToPoint(23.02, 0, 2000, { .forwards = true, .maxSpeed = 60 });
+
+
+
+
+    
+
+
+
+
+
+
+
+
+   // chassis.setPose({64.303, -41.356, 270}); // set the robot's position to the starting position
+    
+// grab mogo
+   // chassis.follow(redstep3_txt, 9, 4000, false);
+	/*
+    chassis.waitUntilDone();
+    pros::delay(500);
+    piston.set_value(true);
+    lift.move(127);
+   // intake2.move(-127);
+    pros::delay(1400);
+    piston.set_value(false);
+
+// intake here
+
+    chassis.turnToPoint(-3.44, -46.723, 2000, {.forwards = false});
+    chassis.waitUntilDone();
+    chassis.moveToPoint(-3.44, -45.523, 2300, {.forwards = false });
+    chassis.waitUntilDone();
+    piston.set_value(true);
+    chassis.turnToPoint(-22.844, -46.723, 1800, {.maxSpeed = 100});
+    chassis.waitUntilDone();
+    chassis.moveToPoint(-22.844, -45.523, 1800, {.maxSpeed = 100});
+    chassis.waitUntilDone();
+    pros::delay(750);
+    chassis.turnToPoint(-24.161, 0.229,1900);
+    chassis.moveToPoint(-24.161, 0.229, 1900, {.maxSpeed = 100});
+        
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 /**
