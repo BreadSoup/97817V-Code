@@ -13,18 +13,19 @@
 #include "pros/rtos.h"
 #include "pros/screen.hpp"
 #include "lemlib/api.hpp" 
+#include <cstdlib> // Include the cstdlib header for rand() and srand()
+#include <ctime> 
 
 //#include "pros/motor_group.hpp"
 
-ASSET(bluestep2_txt); 
-ASSET(red2_txt); 
-ASSET(red3_txt); 
+//ASSET(bluestep2_txt); 
+//ASSET(red2_txt); 
+//ASSET(red3_txt); 
 
 
-ASSET(bluestep5_txt);
-ASSET(bluestep7_txt); 
-ASSET(drakept1_txt);
-ASSET(drakeptBLUE_txt)
+//ASSET(bluestep5_txt);
+//ASSET(bluestep7_txt); 
+//ASSET(drakept1_txt);
 
 
 
@@ -126,7 +127,7 @@ lemlib::ControllerSettings linearController(10, // proportional gain (kP)
 // angular motion controller
 lemlib::ControllerSettings angularController(2, // proportional gain (kP)
                                              0, // integral gain (kI)
-                                             10, // derivative gain (kD)
+                                             15.25, // derivative gain (kD // was 10)
                                              3, // anti windup
                                              1, // small error range, in degrees
                                              100, // small error range timeout, in milliseconds
@@ -146,105 +147,6 @@ lemlib::OdomSensors sensors(nullptr,
 
 
 lemlib::Chassis chassis(yah, linearController, angularController, sensors);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -280,6 +182,8 @@ void initialize() {
 	right_mg.set_gearing(pros::E_MOTOR_GEAR_BLUE);
 	lift.set_gearing(pros::E_MOTOR_GEAR_BLUE);
 	Redriect.set_gearing(pros::E_MOTOR_GEAR_BLUE);
+	encoder.set_position(1000);
+
 	intializePneumatics();
 	encoder.reset(); 
 	encoder.reset_position();
@@ -341,115 +245,140 @@ void autonomous() {
 
 
 
+	static bool intakeside = true;
+	static bool clampside = false; 
+	
+	int intakeon = 127;
+	int intakeoff = 0;
+	
+	bool clamp = true;
+	bool unclamp = false;
+	
+	float max_v = 50;
+	float min_v = 0;
+	
+	int maxang_v = 50;
+	int minang_v = 0;
+/*
 
-
-
-
-
-
-
-    chassis.setPose({55.076, -22.386, 0}); 
-       //  chassis.moveToPoint(-14, -41.356, 5000, { .forwards = true, .maxSpeed = 65 });
-
-
-
-
-
-
-
-    
-// grab mogo
-    chassis.follow(drakeptBLUE_txt, 15, 2000, true); 
-
-	chassis.turnToPoint(28.848, -20.513, 2000, { .forwards = false, .maxSpeed = 50 });
-	lift.move(0);
-	chassis.moveToPoint(28.848, -20.513, 3000, { .forwards = false, .maxSpeed = 45 });
-
+FULL FIELD
+	chassis.setPose({-59.823, 0, 90});
+	//score alliance stake
+	lift.move(intakeon);
+	pros::delay(1000);
+	chassis.moveToPose(-46.865, 0, 90, 2000, {.forwards = intakeside, .maxSpeed = max_v});
+	
+	chassis.turnToPoint(-46.865, -22.68, 4000,{.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v, .earlyExitRange = 20}); 
+	lift.move(intakeoff);
+	chassis.moveToPose(-46.865, -22.68, 0, 2000, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v }); // grab mogo
 	chassis.waitUntilDone();
-	piston.set_value(true);
+	pros::delay(100);
+	piston.set_value(clamp); // clamp mogo
+	pros::delay(750);
+	
+	chassis.turnToPoint(-23.586, -23.74, 2000,{.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v, .earlyExitRange = 10}); // turn to face goal
+	//start intake
+	lift.move(intakeon);
+
+	chassis.moveToPose(-23.586, -23.74, 90, 2000, {.forwards = intakeside, .maxSpeed = 127, .minSpeed = 127}); // score ring
+	chassis.moveToPose(-0.035, -38.833, 100, 2000, {.forwards = intakeside, .lead = .6, .maxSpeed = max_v, .minSpeed = min_v}); // set up to score mogo
+	chassis.waitUntil(4);
+	chassis.cancelMotion();
+	/////////////////////////////////////////////
+	///LB ON//////////////
+	//////////////////////
+	
+	
+	chassis.moveToPoint(23.515, -47.274, 3000, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // grab ring
 	pros::delay(700);
 	lift.move(127);
 
 
-	// clamp mogo
-	chassis.turnToPoint(28.848, -20.513, 2000, { .forwards = true, .maxSpeed = 50 });
-	//piston.set_value(false);
-	lift.move(0);
-	chassis.turnToPoint(28.848, -20.513, 2000, { .forwards = false, .maxSpeed = 50 });
-	chassis.moveToPoint(0, -119, 3000, { .forwards = false, .maxSpeed = 45 });
-	pros:pros::c::delay(700);
-	lift.move(127);
-
-	chassis.turnToPoint(26.8, -46.948, 1000, { .forwards = true, .maxSpeed = 60 });
-	pros::delay(300);
-
-	chassis.moveToPoint(26.8, -46.948, 3000, { .forwards = true, .maxSpeed = 60 });
-	pros::delay(800);
-
-	chassis.waitUntilDone();
-
-
-
-	chassis.turnToPoint(23.02, 0, 2000);
-	chassis.moveToPoint(23.02, 0, 2000, { .forwards = true, .maxSpeed = 60 });
-
-
-
-
-    
-
-
-
-
-
-
-
-
-   // chassis.setPose({64.303, -41.356, 270}); // set the robot's position to the starting position
-    
-// grab mogo
-   // chassis.follow(redstep3_txt, 9, 4000, false);
+	chassis.turnToPoint(0, -40.5, 4000);
+	chassis.moveToPoint(0, -40.5, 2000,{.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v} ); //drive backwards 
 	
-    chassis.waitUntilDone();
-    pros::delay(500);
-    piston.set_value(true);
-    lift.move(127);
-   // intake2.move(-127);
-    pros::delay(1400);
-    piston.set_value(false);
+	chassis.turnToPoint(0, -57.292, 2000, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = maxang_v});// grab score ring on mogo
+	// and score held ring on stake
+	
+	pros::delay(500);
+	chassis.moveToPose(0, -60.292, 180, 2000, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // drive forwards
+	
+	chassis.moveToPose(0, -40.208, 180, 2000, {. forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // reverse 
+	
 
-// intake here
+	chassis.turnToHeading(270, 2000, { .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
+	//chassis.turnToPoint(-58.915, -47.208, 1000, {.maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face 3 ringss maybeeeeeeeeee ad back 20 exitrange
+	chassis.moveToPoint(-58.915, -47.2508, 2000, {.maxSpeed = 55}); // score 3 rings
+	pros::delay(500);	
+	chassis.turnToPoint(-47.208,-58.918, 2000, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
+	chassis.moveToPose(-47.208, -58.918, 135, 2000, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
+	
+	
+	
+	chassis.moveToPose(-32.112, -58.658, 90, 2000, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); //set up to put mogo in corner
+	chassis.moveToPose(-56.751, -58.658, 90, 2000, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // score mogo in corner
+	chassis.waitUntilDone();
+	piston.set_value(unclamp); // unclamp mogo
 
-    chassis.turnToPoint(-3.44, -46.723, 2000, {.forwards = false});
-    chassis.waitUntilDone();
-    chassis.moveToPoint(-3.44, -45.523, 2300, {.forwards = false });
-    chassis.waitUntilDone();
-    piston.set_value(true);
-    chassis.turnToPoint(-22.844, -46.723, 1800, {.maxSpeed = 100});
-    chassis.waitUntilDone();
-    chassis.moveToPoint(-22.844, -45.523, 1800, {.maxSpeed = 100});
-    chassis.waitUntilDone();
-    pros::delay(750);
-    chassis.turnToPoint(-24.161, 0.229,1900);
-    chassis.moveToPoint(-24.161, 0.229, 1900, {.maxSpeed = 100});
-        
+*/
+
+//HALF 
+chassis.setPose({-59.823, 0, 90});
+	//score alliance stake
+	lift.move(intakeon);
+	pros::delay(1000);
+	chassis.moveToPose(-46.865, 0, 90, 2000, {.forwards = intakeside, .maxSpeed = max_v});
+	
+	chassis.turnToPoint(-46.865, -22.68, 4000,{.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v, .earlyExitRange = 20}); 
+	lift.move(intakeoff);
+	chassis.moveToPose(-46.865, -22.68, 0, 2000, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v }); // grab mogo
+	chassis.waitUntilDone();
+	pros::delay(100);
+	piston.set_value(clamp); // clamp mogo
+	pros::delay(750);
+	
+	chassis.turnToPoint(-23.586, -23.74, 2000,{.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v, .earlyExitRange = 10}); // turn to face goal
+	//start intake
+	lift.move(intakeon);
+
+	chassis.moveToPose(-23.586, -23.74, 90, 2000, {.forwards = intakeside, .maxSpeed = 127, .minSpeed = 127}); // score ring
+	chassis.moveToPose(-0.035, -38.833, 100, 2000, {.forwards = intakeside, .lead = .6, .maxSpeed = max_v, .minSpeed = min_v}); // set up to score mogo
+	chassis.waitUntil(4);
+	chassis.cancelMotion();
+	/////////////////////////////////////////////
+	///LB ON//////////////
+	//////////////////////
+	
+	
+	//chassis.moveToPoint(23.515, -47.274, 3000, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // grab ring
+	//pros::delay(700);
 
 
+	chassis.turnToPoint(0, -40.5, 4000);
+	chassis.moveToPoint(0, -40.5, 2000,{.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v} ); //drive backwards 
+	
+	chassis.turnToPoint(0, -57.292, 2000, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = maxang_v});// grab score ring on mogo
+	// and score held ring on stake
+	
+	pros::delay(500);
+	chassis.moveToPose(0, -60.292, 180, 2000, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // drive forwards
+	
+	chassis.moveToPose(0, -40.208, 180, 2000, {. forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // reverse 
+	
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	chassis.turnToHeading(270, 2000, { .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
+	//chassis.turnToPoint(-58.915, -47.208, 1000, {.maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face 3 ringss maybeeeeeeeeee ad back 20 exitrange
+	chassis.moveToPoint(-58.915, -47.2508, 2000, {.maxSpeed = 55}); // score 3 rings
+	pros::delay(500);	
+	chassis.turnToPoint(-47.208,-58.918, 2000, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
+	chassis.moveToPose(-47.208, -58.918, 135, 2000, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
+	
+	
+	
+	chassis.moveToPose(-32.112, -58.658, 90, 2000, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); //set up to put mogo in corner
+	chassis.moveToPose(-56.751, -58.658, 90, 2000, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // score mogo in corner
+	chassis.waitUntilDone();
+	piston.set_value(unclamp); // unclamp mogo
 
 }
 
@@ -469,6 +398,8 @@ void autonomous() {
 void opcontrol() {
 	bool pistonState;
  	bool reversedSteering;
+	///encoder.set_position(1000);
+	
 
 	while (true) {
 		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
