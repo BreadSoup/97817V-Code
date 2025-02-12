@@ -4,20 +4,21 @@
       "name": "PROS Project",
       "includePath": [
         "${workspaceFolder}/**",
-        "c:\\Users\\daxbi\\Downloads\\97817V-Code\\include"
+        "c:\\Users\\daxbi\\Downloads\\97817V-Code\\include",
+        "/home/breadsoup/Documents/GitHub/97817V-Code/include"
       ],
       "defines": [
         "_DEBUG",
         "UNICODE",
         "_UNICODE"
       ],
-      "compilerPath": "c:\\Users\\daxbi\\AppData\\Roaming\\Code\\User\\globalStorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\arm-none-eabi-g++",
+      "compilerPath": "/home/breadsoup/.config/Code - Insiders/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/arm-none-eabi-g++",
       "cStandard": "gnu11",
       "cppStandard": "gnu++20",
       "intelliSenseMode": "gcc-arm",
       "browse": {
         "path": [
-          "c:\\Users\\daxbi\\Downloads\\97817V-Code"
+          "/home/breadsoup/Documents/GitHub/97817V-Code"
         ],
         "limitSymbolsToIncludedHeaders": true,
         "databaseFilename": ""

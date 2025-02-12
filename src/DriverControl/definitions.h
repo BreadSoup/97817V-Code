@@ -16,6 +16,7 @@ extern pros::Motor Redriect1;
 extern pros::Motor Redriect2;
 extern pros::MotorGroup Redriect;
 extern pros::Rotation encoder;
+extern pros::MotorGroup drivetrain;
 
 
 extern bool pistonState;

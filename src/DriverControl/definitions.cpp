@@ -15,5 +15,6 @@ pros::Motor Redriect1(11);
 pros::Motor Redriect2(-1);
 pros::MotorGroup Redriect({11, -1});
 pros::Rotation encoder(2);
+pros::MotorGroup drivetrain({-18,-17,-13,15,19,9});
 bool pistonState = false;
 bool reversedSteering = false;

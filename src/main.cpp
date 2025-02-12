@@ -1,5 +1,6 @@
 // main.cpp g
 #include "main.h"
+#include "lemlib/asset.hpp"
 #include "lemlib/chassis/trackingWheel.hpp"
 #include "pros/misc.h"
 
@@ -9,6 +10,7 @@
 #include "DriverControl/roller.h"
 #include "DriverControl/redirect.h"
 #include "DriverControl/auton.h"
+#include "pros/rtos.h"
 #include "pros/screen.hpp"
 #include "lemlib/api.hpp" 
 #include <cstdlib> // Include the cstdlib header for rand() and srand()
@@ -183,6 +185,8 @@ void initialize() {
 	encoder.set_position(1000);
 
 	intializePneumatics();
+	encoder.reset(); 
+	encoder.reset_position();
 	//encoder.reset();
 
 
@@ -287,6 +291,7 @@ FULL FIELD
 	
 	chassis.moveToPoint(23.515, -47.274, 3000, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // grab ring
 	pros::delay(700);
+	lift.move(127);
 
 
 	chassis.turnToPoint(0, -40.5, 4000);
