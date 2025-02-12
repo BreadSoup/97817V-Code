@@ -1,5 +1,6 @@
 // main.cpp g
 #include "main.h"
+#include "lemlib/asset.hpp"
 #include "lemlib/chassis/trackingWheel.hpp"
 #include "pros/misc.h"
 
@@ -9,6 +10,7 @@
 #include "DriverControl/roller.h"
 #include "DriverControl/redirect.h"
 #include "DriverControl/auton.h"
+#include "pros/rtos.h"
 #include "pros/screen.hpp"
 #include "lemlib/api.hpp" 
 
@@ -22,6 +24,7 @@ ASSET(red3_txt);
 ASSET(bluestep5_txt);
 ASSET(bluestep7_txt); 
 ASSET(drakept1_txt);
+ASSET(drakeptBLUE_txt)
 
 
 
@@ -278,6 +281,8 @@ void initialize() {
 	lift.set_gearing(pros::E_MOTOR_GEAR_BLUE);
 	Redriect.set_gearing(pros::E_MOTOR_GEAR_BLUE);
 	intializePneumatics();
+	encoder.reset(); 
+	encoder.reset_position();
 	//encoder.reset();
 
 
@@ -354,28 +359,26 @@ void autonomous() {
 
     
 // grab mogo
-    chassis.follow(drakept1_txt, 15, 2000, true); 
+    chassis.follow(drakeptBLUE_txt, 15, 2000, true); 
 
-	chassis.turnToHeading(-90, 2000, { .maxSpeed = 40 });
-	chassis.moveToPoint(64.651, 0, 2000, { .forwards = false, .maxSpeed = 40 });
-
-	pros::delay(800);
-	chassis.waitUntilDone();
-	lift.move(127);
-	pros::delay(750);
-	chassis.moveToPoint(60.651, 0, 2000, { .forwards = false, .maxSpeed = 60 });
-
-	// intake herer yahhhhh
 	chassis.turnToPoint(28.848, -20.513, 2000, { .forwards = false, .maxSpeed = 50 });
-
+	lift.move(0);
 	chassis.moveToPoint(28.848, -20.513, 3000, { .forwards = false, .maxSpeed = 45 });
 
 	chassis.waitUntilDone();
 	piston.set_value(true);
 	pros::delay(700);
+	lift.move(127);
 
 
 	// clamp mogo
+	chassis.turnToPoint(28.848, -20.513, 2000, { .forwards = true, .maxSpeed = 50 });
+	//piston.set_value(false);
+	lift.move(0);
+	chassis.turnToPoint(28.848, -20.513, 2000, { .forwards = false, .maxSpeed = 50 });
+	chassis.moveToPoint(0, -119, 3000, { .forwards = false, .maxSpeed = 45 });
+	pros:pros::c::delay(700);
+	lift.move(127);
 
 	chassis.turnToPoint(26.8, -46.948, 1000, { .forwards = true, .maxSpeed = 60 });
 	pros::delay(300);
@@ -384,6 +387,8 @@ void autonomous() {
 	pros::delay(800);
 
 	chassis.waitUntilDone();
+
+
 
 	chassis.turnToPoint(23.02, 0, 2000);
 	chassis.moveToPoint(23.02, 0, 2000, { .forwards = true, .maxSpeed = 60 });
@@ -404,7 +409,7 @@ void autonomous() {
     
 // grab mogo
    // chassis.follow(redstep3_txt, 9, 4000, false);
-	/*
+	
     chassis.waitUntilDone();
     pros::delay(500);
     piston.set_value(true);
@@ -431,7 +436,7 @@ void autonomous() {
 
 
 
-*/
+
 
 
 
