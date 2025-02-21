@@ -1,9 +1,9 @@
-#ifndef BRAINSCREEN_H
+/*#ifndef BRAINSCREEN_H
 #define BRAINSCREEN_H
 
 #include "liblvgl/core/lv_disp.h"
 #include "liblvgl/widgets/lv_img.h"
-LV_IMG_DECLARE(awesome);
+/*LV_IMG_DECLARE(awesome);
 
 extern lv_obj_t* awesome_obj;
 
@@ -18,4 +18,4 @@ inline void okJarvisActivateFunnyCatImageOnVexBrain() {
     lv_obj_align(awesome_obj, LV_ALIGN_TOP_LEFT, 0, 0);
 }
 
-#endif
+#endif*/

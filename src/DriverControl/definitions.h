@@ -3,6 +3,7 @@
 
 #include "pros/adi.hpp"
 #include "pros/motor_group.hpp"
+#include "pros/rotation.hpp"
 
 extern pros::Controller master;
 extern pros::adi::DigitalOut piston;
@@ -14,7 +15,8 @@ extern pros::Motor lift;
 extern pros::Motor Redriect1;
 extern pros::Motor Redriect2;
 extern pros::MotorGroup Redriect;
-extern pros::adi::Encoder encoder;
+extern pros::Rotation encoder;
+extern pros::MotorGroup drivetrain;
 
 
 extern bool pistonState;
