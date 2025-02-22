@@ -1,4 +1,4 @@
-// main.cpp g
+// main.cpp
 #include "main.h"
 #include "lemlib/asset.hpp"
 #include "lemlib/chassis/trackingWheel.hpp"
@@ -27,90 +27,17 @@
 //ASSET(bluestep7_txt); 
 //ASSET(drakept1_txt);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 pros::Imu imu(8); 
 pros::MotorGroup leftm({-18, -17, -13});
 pros::MotorGroup rightm({15, 19, 9});
-
+lemlib::TrackingWheel horztrackingwheel(&horztracking, lemlib::Omniwheel::NEW_2, -1);
 // ---------------------- LemLib Setup ----------------------
 
 lemlib::Drivetrain yah(&leftm, // left motor group
                               &rightm, // right motor group
-                              12.5, // 10 inch track width
-                              lemlib::Omniwheel::NEW_325_HALF, // using new 4" omnis
-                              450, // drivetrain rpm is 360
+                              12.5,
+                              lemlib::Omniwheel::NEW_325_HALF, 
+                              450, 
                               2 // horizontal drift is 2. If we had traction wheels, it would have been 8
 );
 lemlib::ControllerSettings linearController(10, // proportional gain (kP)
@@ -139,7 +66,7 @@ lemlib::ControllerSettings angularController(2.1, // proportional gain (kP)
 // sensors for odometry
 lemlib::OdomSensors sensors(nullptr, 
                             nullptr, 
-                            nullptr,
+                            &horztrackingwheel,
                             nullptr, 
                             &imu // inertial sensor
 );
@@ -150,8 +77,8 @@ lemlib::Chassis chassis(yah, linearController, angularController, sensors);
 
 
 
-LV_IMG_DECLARE(awesome);
-lv_obj_t* awesome_obj = NULL;
+//LV_IMG_DECLARE(awesome);
+//lv_obj_t* awesome_obj = NULL;
 
 /**
  * A callback function for LLEMU's center button.
@@ -191,7 +118,7 @@ void initialize() {
 	//encoder.reset();
 
 
-	pros::lcd::initialize(); // initialize brain screen
+	//pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate();     // calibrate sensors
 
 
@@ -204,10 +131,11 @@ void initialize() {
            pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
            pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+		   pros::lcd::print(3, "horz: %i", horztracking.get_position());
            // log position telemetry
            lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
            // delay to save resources
-           pros::delay(50);
+           pros::delay(20);
 
       }});
 }
@@ -255,7 +183,7 @@ void autonomous() {
 	bool clamp = true;
 	bool unclamp = false;
 	
-	float max_v = 100;
+	float max_v = 105;
 	float min_v = 0;
 	
 	int maxang_v = 70;
@@ -266,6 +194,7 @@ void autonomous() {
 
 
 //FULL FIELD
+/*
 	chassis.setPose({-59.823, 0, 90});
 	//score alliance stake
 	lift.move_voltage(intakeon);
@@ -274,7 +203,7 @@ void autonomous() {
 	
 	chassis.turnToPoint(-46.865, -22.68, globalTimeout,{.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v, .earlyExitRange = 20}); 
 	lift.move_voltage(intakeoff);
-	chassis.moveToPose(-46.865, -25.68, 0, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v }); // grab mogo
+	chassis.moveToPose(-46.865, -22.68, 0, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v }); // grab mogo
 	chassis.waitUntilDone();
 	pros::delay(50);
 	piston.set_value(clamp); // clamp mogo
@@ -341,10 +270,13 @@ void autonomous() {
 	chassis.waitUntilDone();
 	pros::delay(750);
 	piston.set_value(unclamp); // unclamp mogo
-	chassis.moveToPose(	-46.865	, 0, 270, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = 127, .minSpeed = 127}); 
-	chassis.turnToHeading(-270, globalTimeout, { .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
+	lift.move_voltage(intakeoff);
 
-	chassis.moveToPose(-59.23, 0, 90, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = max_v, .minSpeed = min_v}); 
+	// //
+	// chassis.moveToPose(	-46.865	, 0, 270, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = 127, .minSpeed = 127}); 
+	// chassis.turnToHeading(-270, globalTimeout, { .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
+
+	// chassis.moveToPose(-59.23, 0, 90, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = max_v, .minSpeed = min_v}); 
 	
 	
 
@@ -368,8 +300,9 @@ void autonomous() {
 chassis.moveToPose(	-46.865	, 0, 0, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = 127, .minSpeed = 127}); // go to middle after letting go of clamp
 chassis.turnToPoint(-47.2, 23.992, globalTimeout, {.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal +x +y
 chassis.moveToPoint(-47.2, 23.992, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // drive forwards toward mog
-
+pros::delay(300);
 piston.set_value(clamp); // clamp mogo
+pros::delay(400);
 
 
 chassis.turnToPoint(-23.586, 23.74, globalTimeout,{.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v, .earlyExitRange = 10}); // turn to face ring
@@ -437,6 +370,7 @@ chassis.moveToPose(	22.961	, 47.201, 90, globalTimeout,{.forwards = intakeside, 
 
 chassis.turnToPoint(58.469, 23.473, globalTimeout, {.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal +x +y
 chassis.moveToPoint(58.469, 23.473, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // drive forwards toward mogo
+pros::delay(300);
 piston.set_value(clamp); // clamp mogo
 pros::delay(500);
 //todo add waits
@@ -463,7 +397,7 @@ chassis.moveToPose(56.751, -58.658, 0, globalTimeout, {.forwards = clampside, .m
 
 
 
-/*
+*/
 
 //HALF 
 chassis.setPose({-59.823, 0, 90});
@@ -522,7 +456,13 @@ chassis.setPose({-59.823, 0, 90});
 	chassis.moveToPose(-56.751, -58.658, 90, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // score mogo in corner
 	chassis.waitUntilDone();
 	piston.set_value(unclamp); // unclamp mogo
-*/
+	lift.move(intakeoff);
+	chassis.moveToPose(	-46.865	, 0, 270, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = 127, .minSpeed = 127}); 
+	chassis.turnToHeading(-270, globalTimeout, { .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
+
+	chassis.moveToPose(-59.23, 0, 90, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = max_v, .minSpeed = min_v}); 
+	
+
 }
 
 /**

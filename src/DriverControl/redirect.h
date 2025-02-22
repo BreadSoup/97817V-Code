@@ -43,8 +43,8 @@ inline void RedirectControl() {
     
 
     // Display rotation sensor position
-    pros::lcd::set_text(2, "Rotation: " + std::to_string(rotation_position));
-    pros::lcd::set_text(3, "Target: " + std::to_string(target_position));
+    pros::lcd::set_text(5, "Rotation: " + std::to_string(rotation_position));
+    pros::lcd::set_text(6, "Target: " + std::to_string(target_position));
 
     // Manual control via controller buttons
     if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
