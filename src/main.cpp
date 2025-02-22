@@ -255,7 +255,7 @@ void autonomous() {
 	bool clamp = true;
 	bool unclamp = false;
 	
-	float max_v = 85;
+	float max_v = 100;
 	float min_v = 0;
 	
 	int maxang_v = 70;
@@ -274,7 +274,7 @@ void autonomous() {
 	
 	chassis.turnToPoint(-46.865, -22.68, globalTimeout,{.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v, .earlyExitRange = 20}); 
 	lift.move_voltage(intakeoff);
-	chassis.moveToPose(-46.865, -22.68, 0, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v }); // grab mogo
+	chassis.moveToPose(-46.865, -25.68, 0, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v }); // grab mogo
 	chassis.waitUntilDone();
 	pros::delay(50);
 	piston.set_value(clamp); // clamp mogo
