@@ -17,7 +17,7 @@ pros::Motor Redriect2(-0);
 pros::Motor Intake1(-1);
 pros::MotorGroup Redriect({0, -0}); //idk what port 0 does
 pros::Rotation encoder(2);
-pros::Rotation horztracking(6);
+pros::Rotation horztracking(-6);
 pros::MotorGroup drivetrain({-18,-17,-13,15,19,9});
 bool pistonState = false;
 bool reversedSteering = false;
