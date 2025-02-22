@@ -30,7 +30,7 @@
 pros::Imu imu(8); 
 pros::MotorGroup leftm({-18, -17, -13});
 pros::MotorGroup rightm({15, 19, 9});
-lemlib::TrackingWheel horztrackingwheel(&horztracking, lemlib::Omniwheel::NEW_2, -1);
+lemlib::TrackingWheel horztrackingwheel(&horztracking, lemlib::Omniwheel::NEW_2, 3);
 // ---------------------- LemLib Setup ----------------------
 
 lemlib::Drivetrain yah(&leftm, // left motor group
@@ -509,11 +509,11 @@ chassis.setPose({-59.823, 0, 90});
 	chassis.moveToPose(0, -55.292, 180, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // drive forwards
 	pros::delay(500);
 
-	chassis.moveToPose(0, -40.208, 180, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // reverse 
+	chassis.moveToPose(0, -47.08, 180, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // reverse 
 	
 
-	chassis.turnToHeading(270, globalTimeout, { .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
-	//chassis.turnToPoint(-58.915, -47.208, 1000, {.maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face 3 ringss maybeeeeeeeeee ad back 20 exitrange
+	//chassis.turnToHeading(270, globalTimeout, { .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
+	chassis.turnToPoint(-58.915, -47.08, 1000, {.maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face 3 ringss maybeeeeeeeeee ad back 20 exitrange
 	chassis.moveToPoint(-58.915, -47.08, 3500, {.maxSpeed = 125}); // score 3 rings change from mt 
 	chassis.waitUntil(11);
 	chassis.cancelMotion();
