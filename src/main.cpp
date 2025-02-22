@@ -464,8 +464,6 @@ chassis.moveToPose(56.751, -58.658, 0, globalTimeout, {.forwards = clampside, .m
 	
 /// end of half1 
 
-
-
 chassis.setPose({-59.823, 0, 90});
 	//score alliance stake
 	lift.move_voltage(intakeon);
@@ -494,9 +492,9 @@ chassis.setPose({-59.823, 0, 90});
 	//////////////////////
 	
 	
-	// chassis.moveToPoint(23.315, -47.274, globalTimeout, {.forwards = intakeside, .maxSpeed = 72.28, .minSpeed = min_v}); // grab ring
-	// pros::delay(500);
-	// //lift.move_voltage(127);
+	chassis.moveToPoint(23.315, -47.274, globalTimeout, {.forwards = intakeside, .maxSpeed = 72.28, .minSpeed = min_v}); // grab ring
+	pros::delay(500);
+	//lift.move_voltage(127);
 
 
 
@@ -544,11 +542,17 @@ chassis.setPose({-59.823, 0, 90});
 	lift.move_voltage(intakeoff);
 
 	
-	chassis.moveToPose(	-46.865	, 0, 270, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = 127, .minSpeed = 127}); 
+	chassis.moveToPose(	-46.865	, 0, 0, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = 127, .minSpeed = 127}); 
 	chassis.turnToHeading(-270, globalTimeout, { .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
 
 	chassis.moveToPose(-59.23, 0, 90, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = max_v, .minSpeed = min_v}); 
-	 
+	
+	
+
+
+
+
+
 }
 
 /**
