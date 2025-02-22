@@ -52,9 +52,9 @@ lemlib::ControllerSettings linearController(10, // proportional gain (kP)
 );
 
 // angular motion controller
-lemlib::ControllerSettings angularController(2.1, // proportional gain (kP)
+lemlib::ControllerSettings angularController(1.25, // proportional gain (kP)
                                              0, // integral gain (kI)
-                                             14.5, // derivative gain (kD // was 10)
+                                             18.5, // derivative gain (kD // was 10)
                                              3, // anti windup
                                              1, // small error range, in degrees
                                              100, // small error range timeout, in milliseconds
@@ -472,12 +472,12 @@ chassis.setPose({-59.823, 0, 90});
 	
 	chassis.turnToPoint(-46.865, -22.68, globalTimeout,{.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v, .earlyExitRange = 20}); 
 	lift.move_voltage(intakeoff);
-	chassis.moveToPose(-46.865, -22.68, 0, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v }); // grab mogo
+	chassis.moveToPose(-42.865, -25.68, 0, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v }); // grab mogo
 	chassis.waitUntilDone();
 	pros::delay(50);
 	piston.set_value(clamp); // clamp mogo
-	pros::delay(200);
-	
+	lift.move_voltage(-12000);
+	pros::delay(100);
 	chassis.turnToPoint(-23.586, -23.74, globalTimeout,{.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v, .earlyExitRange = 10}); // turn to face goal
 	//start intake
 	lift.move_voltage(intakeon);
@@ -539,11 +539,12 @@ chassis.setPose({-59.823, 0, 90});
 	chassis.waitUntilDone();
 	pros::delay(750);
 	piston.set_value(unclamp); // unclamp mogo
-	lift.move_voltage(intakeoff);
+	lift.move_voltage(-12000);
 
 	
 	chassis.moveToPose(	-46.865	, 0, 0, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = 127, .minSpeed = 127}); 
 	chassis.turnToHeading(-270, globalTimeout, { .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
+	lift.move_voltage(intakeoff);
 
 	chassis.moveToPose(-59.23, 0, 90, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = max_v, .minSpeed = min_v}); 
 	
