@@ -169,9 +169,82 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
+
+
+ bool intake_on = true;   
+ bool intakerevdone = false;
+
+ void intakereverse(void* param) {
+
+    static int state = 1;
+    static int stateStartTime = 0;
+
+    const int normalVoltage = 12000;
+    const int reverseVoltage = -12000;
+    const int velocityThreshold = 10;
+
+    while (true) {
+        int currentTime = pros::millis();
+
+        if (!intake_on) {
+            lift.move_voltage(0);
+        } else {
+            switch (state) {
+                case 1: 
+                    lift.move_voltage(normalVoltage);
+                    if (lift.get_actual_velocity() < velocityThreshold) {
+                        if (stateStartTime == 0) {
+                            stateStartTime = currentTime;
+                        }
+                        if (stateStartTime != 0 && (currentTime - stateStartTime >= 2000)) {
+                            state = 2;
+                            stateStartTime = currentTime;
+                        }
+                    }
+                    if (lift.get_actual_velocity() >= velocityThreshold) {
+                        stateStartTime = 0;
+                    }
+                    break;
+
+                case 2:
+                    lift.move_voltage(reverseVoltage);
+                    if (currentTime - stateStartTime >= 1000) {
+                        state = 3;
+                        stateStartTime = currentTime;
+                    }
+                    break;
+
+                case 3:  
+                    lift.move_voltage(normalVoltage);
+                    if (lift.get_actual_velocity() < velocityThreshold) {
+                        state = 2; 
+                        stateStartTime = currentTime;
+                    }
+                    if (lift.get_actual_velocity() >= velocityThreshold) {
+                        state = 1;  
+                        stateStartTime = 0;
+                    }
+                    break;
+
+                default:
+                    state = 1;
+                    stateStartTime = 0;
+                    break;
+            }
+
+			if (intakerevdone) {
+				break ;
+        }
+        pros::delay(20);  
+    }
+}
+ }
+
 void autonomous() {
 	//auton();
 
+
+	pros::Task task(intakereverse, (void*)NULL);
 
 
 	bool intakeside = true;
@@ -464,9 +537,13 @@ chassis.moveToPose(56.751, -58.658, 0, globalTimeout, {.forwards = clampside, .m
 	
 /// end of half1 
 
+
+
+
 chassis.setPose({-59.823, 0, 90});
 	//score alliance stake
-	lift.move_voltage(intakeon);
+	//lift.move_voltage(intakeon);
+	intake_on = true;
 	pros::delay(700);
 	chassis.moveToPose(-46.865, 0, 90, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v});
 	
@@ -480,7 +557,8 @@ chassis.setPose({-59.823, 0, 90});
 	
 	chassis.turnToPoint(-23.586, -23.74, globalTimeout,{.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v, .earlyExitRange = 10}); // turn to face goal
 	//start intake
-	lift.move_voltage(intakeon);
+	//lift.move_voltage(intakeon);
+	intake_on = true;
 
 	chassis.moveToPose(-23.586, -23.74, 90, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
 	pros::delay(380);
@@ -539,7 +617,8 @@ chassis.setPose({-59.823, 0, 90});
 	chassis.waitUntilDone();
 	pros::delay(750);
 	piston.set_value(unclamp); // unclamp mogo
-	lift.move_voltage(intakeoff);
+	//lift.move_voltage(intakeoff);
+	intake_on = false;
 
 	
 	chassis.moveToPose(	-46.865	, 0, 0, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = 127, .minSpeed = 127}); 
@@ -572,6 +651,7 @@ void opcontrol() {
 	bool pistonState;
  	bool reversedSteering;
 	///encoder.set_position(1000);
+	intakerevdone = true;
 	
 
 	while (true) {
