@@ -11,11 +11,13 @@ extern pros::adi::DigitalOut piston2;
 extern pros::MotorGroup left_mg;
 extern pros::MotorGroup right_mg;
 extern pros::MotorGroup drivetrain;
-extern pros::Motor lift;
+extern pros::MotorGroup lift;
+extern pros::Motor Intake1;
 extern pros::Motor Redriect1;
 extern pros::Motor Redriect2;
 extern pros::MotorGroup Redriect;
 extern pros::Rotation encoder;
+extern pros::Rotation horztracking;
 extern pros::MotorGroup drivetrain;
 
 

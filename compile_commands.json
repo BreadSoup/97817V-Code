@@ -5,12 +5,15 @@
             "-c",
             "-target",
             "armv7ar-none-none-eabi",
-            "-isystem/home/breadsoup/.config/Code - Insiders/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/c++/13.3.1",
-            "-isystem/home/breadsoup/.config/Code - Insiders/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/c++/13.3.1/arm-none-eabi/thumb/v7-a+simd/softfp",
-            "-isystem/home/breadsoup/.config/Code - Insiders/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/c++/13.3.1/backward",
-            "-isystem/home/breadsoup/.config/Code - Insiders/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/../lib/gcc/arm-none-eabi/13.3.1/include",
-            "-isystem/home/breadsoup/.config/Code - Insiders/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/../lib/gcc/arm-none-eabi/13.3.1/include-fixed",
-            "-isystem/home/breadsoup/.config/Code - Insiders/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include",
+            "-fno-ms-extensions",
+            "-fno-ms-compatibility",
+            "-fno-delayed-template-parsing",
+            "-isystemc:\\users\\daxbi\\appdata\\roaming\\code\\user\\globalstorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include/c++/10.3.1",
+            "-isystemc:\\users\\daxbi\\appdata\\roaming\\code\\user\\globalstorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7-a+simd/softfp",
+            "-isystemc:\\users\\daxbi\\appdata\\roaming\\code\\user\\globalstorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include/c++/10.3.1/backward",
+            "-isystemc:\\users\\daxbi\\appdata\\roaming\\code\\user\\globalstorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\../lib/gcc/arm-none-eabi/10.3.1/include",
+            "-isystemc:\\users\\daxbi\\appdata\\roaming\\code\\user\\globalstorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\../lib/gcc/arm-none-eabi/10.3.1/include-fixed",
+            "-isystemc:\\users\\daxbi\\appdata\\roaming\\code\\user\\globalstorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include",
             "-iquote./include",
             "-iquote./include/DriverControl/",
             "-mcpu=cortex-a9",
@@ -32,10 +35,10 @@
             "--std=gnu++20",
             "-o",
             "bin/DriverControl/definitions.cpp.o",
-            "src/DriverControl/definitions.cpp"
+            "src\\DriverControl\\definitions.cpp"
         ],
-        "directory": "/home/breadsoup/Documents/GitHub/97817V-Code",
-        "file": "src/DriverControl/definitions.cpp"
+        "directory": "C:\\Users\\daxbi\\Downloads\\97817V-Code-4",
+        "file": "src\\DriverControl\\definitions.cpp"
     },
     {
         "arguments": [
@@ -43,12 +46,15 @@
             "-c",
             "-target",
             "armv7ar-none-none-eabi",
-            "-isystem/home/breadsoup/.config/Code - Insiders/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/c++/13.3.1",
-            "-isystem/home/breadsoup/.config/Code - Insiders/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/c++/13.3.1/arm-none-eabi/thumb/v7-a+simd/softfp",
-            "-isystem/home/breadsoup/.config/Code - Insiders/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/c++/13.3.1/backward",
-            "-isystem/home/breadsoup/.config/Code - Insiders/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/../lib/gcc/arm-none-eabi/13.3.1/include",
-            "-isystem/home/breadsoup/.config/Code - Insiders/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/../lib/gcc/arm-none-eabi/13.3.1/include-fixed",
-            "-isystem/home/breadsoup/.config/Code - Insiders/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include",
+            "-fno-ms-extensions",
+            "-fno-ms-compatibility",
+            "-fno-delayed-template-parsing",
+            "-isystemc:\\users\\daxbi\\appdata\\roaming\\code\\user\\globalstorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include/c++/10.3.1",
+            "-isystemc:\\users\\daxbi\\appdata\\roaming\\code\\user\\globalstorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7-a+simd/softfp",
+            "-isystemc:\\users\\daxbi\\appdata\\roaming\\code\\user\\globalstorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include/c++/10.3.1/backward",
+            "-isystemc:\\users\\daxbi\\appdata\\roaming\\code\\user\\globalstorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\../lib/gcc/arm-none-eabi/10.3.1/include",
+            "-isystemc:\\users\\daxbi\\appdata\\roaming\\code\\user\\globalstorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\../lib/gcc/arm-none-eabi/10.3.1/include-fixed",
+            "-isystemc:\\users\\daxbi\\appdata\\roaming\\code\\user\\globalstorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include",
             "-iquote./include",
             "-iquote./include/./",
             "-mcpu=cortex-a9",
@@ -70,9 +76,9 @@
             "--std=gnu++20",
             "-o",
             "bin/main.cpp.o",
-            "src/main.cpp"
+            "src\\main.cpp"
         ],
-        "directory": "/home/breadsoup/Documents/GitHub/97817V-Code",
-        "file": "src/main.cpp"
+        "directory": "C:\\Users\\daxbi\\Downloads\\97817V-Code-4",
+        "file": "src\\main.cpp"
     }
 ]
