@@ -548,10 +548,10 @@ chassis.setPose({-59.823, 0, 90});
 	pros::delay(700);
 	chassis.moveToPose(-46.865, 0, 90, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v});
 	
-	chassis.turnToPoint(-46.865, -22.68, globalTimeout,{.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v, .earlyExitRange = 20}); 
+	chassis.turnToPoint(-46.865, -22.68, globalTimeout,{.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v, .earlyExitRange = 20});
 	//lift.move_voltage(intakeoff);
 	intake_on = false;
-	chassis.moveToPose(-42.865, -25.68, 0, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v }); // grab mogo
+	chassis.moveToPose(-46.865, -24.68, 0, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v});
 	chassis.waitUntilDone();
 	pros::delay(50);
 	piston.set_value(clamp); // clamp mogo
@@ -623,11 +623,11 @@ chassis.setPose({-59.823, 0, 90});
 	intake_on = false;
 
 	
-	chassis.moveToPose(	-46.865	, 0, 0, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = 127, .minSpeed = 127}); 
-	chassis.turnToHeading(-270, globalTimeout, { .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
-	intake_on = false;
+	// chassis.moveToPose(	-46.865	, 0, 0, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = 127, .minSpeed = 127}); 
+	// chassis.turnToHeading(-270, globalTimeout, { .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
+	// intake_on = false;
 
-	chassis.moveToPose(-59.23, 0, 90, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = max_v, .minSpeed = min_v}); 
+	// chassis.moveToPose(-59.23, 0, 90, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = max_v, .minSpeed = min_v}); 
 	
 	
 
