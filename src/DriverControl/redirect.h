@@ -25,7 +25,7 @@ bool moving_back_to_0 = false;
 // Motor, Encoder, and Controller Instances
 extern pros::Motor Redriect1;    
 extern pros::Motor Redriect2;    
-extern pros::MotorGroup Redriect; 
+extern pros::Motor Redriect; 
 extern pros::Controller master;
 
 // Quad Encoder Ports

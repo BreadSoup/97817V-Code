@@ -30,13 +30,13 @@
 pros::Imu imu(8); 
 pros::MotorGroup leftm({-18, -17, -13});
 pros::MotorGroup rightm({15, 19, 9});
-lemlib::TrackingWheel horztrackingwheel(&horztracking, lemlib::Omniwheel::NEW_2, 3);
+lemlib::TrackingWheel horztrackingwheel(&horztracking, lemlib::Omniwheel::NEW_275, -1.5);
 // ---------------------- LemLib Setup ----------------------
 
 lemlib::Drivetrain yah(&leftm, // left motor group
                               &rightm, // right motor group
                               12.5,
-                              lemlib::Omniwheel::NEW_325_HALF, 
+                              lemlib::Omniwheel::NEW_325, 
                               450, 
                               2 // horizontal drift is 2. If we had traction wheels, it would have been 8
 );
@@ -52,9 +52,9 @@ lemlib::ControllerSettings linearController(10, // proportional gain (kP)
 );
 
 // angular motion controller
-lemlib::ControllerSettings angularController(1.25, // proportional gain (kP)
+lemlib::ControllerSettings angularController(1.5, // proportional gain (kP)
                                              0, // integral gain (kI)
-                                             18.5, // derivative gain (kD // was 10)
+                                             10, // derivative gain (kD // was 10)
                                              3, // anti windup
                                              1, // small error range, in degrees
                                              100, // small error range timeout, in milliseconds
@@ -208,8 +208,9 @@ void competition_initialize() {}
 
                 case 2:
                     lift.move_voltage(reverseVoltage);
+					Intake1.move_voltage(reverseVoltage);
                     if (currentTime - stateStartTime >= 1000) {
-                        state = 3;
+                        state = 1;
                         stateStartTime = currentTime;
                     }
                     break;

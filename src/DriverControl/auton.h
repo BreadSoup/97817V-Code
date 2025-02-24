@@ -10,7 +10,7 @@ inline void auton(){
     drivetrain.move(-50);
     pros::c::delay(950);
     drivetrain.move(0);
-    piston2.set_value(false);
+    //piston2.set_value(false);
     pros::c::delay(200);
     piston.set_value(true);
     pros::c::delay(1500);
