@@ -196,7 +196,7 @@ void competition_initialize() {}
                         if (stateStartTime == 0) {
                             stateStartTime = currentTime;
                         }
-                        if (stateStartTime != 0 && (currentTime - stateStartTime >= 2000)) {
+                        if (stateStartTime != 0 && (currentTime - stateStartTime >= 1000)) {
                             state = 2;
                             stateStartTime = currentTime;
                         }
@@ -207,8 +207,7 @@ void competition_initialize() {}
                     break;
 
                 case 2:
-                    lift.move_voltage(reverseVoltage);
-					Intake1.move_voltage(reverseVoltage);
+                    Intake2.move_voltage(reverseVoltage);
                     if (currentTime - stateStartTime >= 1000) {
                         state = 1;
                         stateStartTime = currentTime;
@@ -579,8 +578,8 @@ chassis.setPose({-59.823, 0, 90});
 
 
 
-	chassis.turnToPoint(0, -40.5, globalTimeout, {.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
-	chassis.moveToPoint(0, -40.5, globalTimeout,{.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v} ); //drive backwards 
+	chassis.turnToPoint(0, -45, globalTimeout, {.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
+	chassis.moveToPoint(0, -45, globalTimeout,{.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v} ); //drive backwards 
 	
 	chassis.turnToPoint(0, -53.292, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = maxang_v});// grab score ring on mogo
 	// and score held ring on stake

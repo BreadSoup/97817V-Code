@@ -13,6 +13,7 @@ extern pros::MotorGroup right_mg;
 extern pros::MotorGroup drivetrain;
 extern pros::MotorGroup lift;
 extern pros::Motor Intake1;
+extern pros::Motor Intake2;
 extern pros::Motor Redriect1;
 extern pros::Motor Redriect2;
 extern pros::Motor Redriect;
