@@ -132,10 +132,7 @@ bin/main.cpp.o: src/main.cpp include/main.h include/api.h \
  include/pros/vision.h include/lemlib/asset.hpp \
  include/lemlib/chassis/trackingWheel.hpp include/pros/motor_group.hpp \
  include/pros/adi.hpp include/pros/rotation.hpp src/Brain/BrainScreen.h \
- src/DriverControl/definitions.h src/DriverControl/pneumatics.h \
- src/DriverControl/definitions.h src/DriverControl/roller.h \
- src/DriverControl/redirect.h include/pros/llemu.hpp \
- src/DriverControl/auton.h include/pros/screen.hpp include/lemlib/api.hpp \
+ src/DriverControl/definitions.h include/lemlib/api.hpp \
  include/lemlib/pid.hpp include/lemlib/pose.hpp include/lemlib/util.hpp \
  include/lemlib/chassis/chassis.hpp include/pros/imu.hpp \
  include/lemlib/exitcondition.hpp include/lemlib/driveCurve.hpp \
@@ -143,7 +140,11 @@ bin/main.cpp.o: src/main.cpp include/main.h include/api.h \
  include/fmt/core.h include/fmt/format-inl.h \
  include/lemlib/logger/baseSink.hpp include/fmt/args.h \
  include/lemlib/logger/message.hpp include/lemlib/logger/infoSink.hpp \
- include/lemlib/logger/telemetrySink.hpp
+ include/lemlib/logger/telemetrySink.hpp src/DriverControl/pneumatics.h \
+ src/DriverControl/definitions.h src/DriverControl/roller.h \
+ src/DriverControl/redirect.h src/DriverControl/auton.h \
+ src/DriverControl/LadyBrown.h include/pros/llemu.hpp \
+ include/pros/screen.hpp
 include/main.h:
 include/api.h:
 include/pros/adi.h:
@@ -365,13 +366,6 @@ include/pros/adi.hpp:
 include/pros/rotation.hpp:
 src/Brain/BrainScreen.h:
 src/DriverControl/definitions.h:
-src/DriverControl/pneumatics.h:
-src/DriverControl/definitions.h:
-src/DriverControl/roller.h:
-src/DriverControl/redirect.h:
-include/pros/llemu.hpp:
-src/DriverControl/auton.h:
-include/pros/screen.hpp:
 include/lemlib/api.hpp:
 include/lemlib/pid.hpp:
 include/lemlib/pose.hpp:
@@ -390,3 +384,11 @@ include/fmt/args.h:
 include/lemlib/logger/message.hpp:
 include/lemlib/logger/infoSink.hpp:
 include/lemlib/logger/telemetrySink.hpp:
+src/DriverControl/pneumatics.h:
+src/DriverControl/definitions.h:
+src/DriverControl/roller.h:
+src/DriverControl/redirect.h:
+src/DriverControl/auton.h:
+src/DriverControl/LadyBrown.h:
+include/pros/llemu.hpp:
+include/pros/screen.hpp:

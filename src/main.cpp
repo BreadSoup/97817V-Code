@@ -10,6 +10,7 @@
 #include "DriverControl/roller.h"
 #include "DriverControl/redirect.h"
 #include "DriverControl/auton.h"
+#include "DriverControl/LadyBrown.h"
 #include "pros/rtos.h"
 #include "pros/screen.hpp"
 #include "lemlib/api.hpp" 
@@ -27,53 +28,53 @@
 //ASSET(bluestep7_txt); 
 //ASSET(drakept1_txt);
 
-pros::Imu imu(8); 
-pros::MotorGroup leftm({-18, -17, -13});
-pros::MotorGroup rightm({15, 19, 9});
-lemlib::TrackingWheel horztrackingwheel(&horztracking, lemlib::Omniwheel::NEW_275, -1.5);
-// ---------------------- LemLib Setup ----------------------
+// pros::Imu imu(8); 
+// pros::MotorGroup leftm({-18, -17, -13});
+// pros::MotorGroup rightm({15, 19, 9});
+// lemlib::TrackingWheel horztrackingwheel(&horztracking, lemlib::Omniwheel::NEW_275, -1.5);
+// // ---------------------- LemLib Setup ----------------------
 
-lemlib::Drivetrain yah(&leftm, // left motor group
-                              &rightm, // right motor group
-                              12.5,
-                              lemlib::Omniwheel::NEW_325, 
-                              450, 
-                              2 // horizontal drift is 2. If we had traction wheels, it would have been 8
-);
-lemlib::ControllerSettings linearController(10.25, // proportional gain (kP)
-                                            0, // integral gain (kI)
-                                            3, // derivative gain (kD)
-                                            3, // anti windup
-                                            1, // small error range, in inches
-                                            100, // small error range timeout, in milliseconds
-                                            3, // large error range, in inches
-                                            500, // large error range timeout, in milliseconds
-                                            20 // maximum acceleration (slew)              // was 20 
-);
+// lemlib::Drivetrain yah(&leftm, // left motor group
+//                               &rightm, // right motor group
+//                               12.5,
+//                               lemlib::Omniwheel::NEW_325, 
+//                               450, 
+//                               2 // horizontal drift is 2. If we had traction wheels, it would have been 8
+// );
+// lemlib::ControllerSettings linearController(10.25, // proportional gain (kP)
+//                                             0, // integral gain (kI)
+//                                             3, // derivative gain (kD)
+//                                             3, // anti windup
+//                                             1, // small error range, in inches
+//                                             100, // small error range timeout, in milliseconds
+//                                             3, // large error range, in inches
+//                                             500, // large error range timeout, in milliseconds
+//                                             20 // maximum acceleration (slew)              // was 20 
+// );
 
-// angular motion controller
-lemlib::ControllerSettings angularController(2, // proportional gain (kP)
-                                             0, // integral gain (kI)
-                                             14.5, // derivative gain (kD // was 10)
-                                             3, // anti windup
-                                             1, // small error range, in degrees
-                                             100, // small error range timeout, in milliseconds
-                                             3, // large error range, in degrees
-                                             500, // large error range timeout, in milliseconds
-                                             0 // maximum acceleration (slew)
-);
+// // angular motion controller
+// lemlib::ControllerSettings angularController(1.85, // proportional gain (kP)
+//                                              0, // integral gain (kI)
+//                                              14.5, // derivative gain (kD // was 10)
+//                                              3, // anti windup
+//                                              1, // small error range, in degrees
+//                                              100, // small error range timeout, in milliseconds
+//                                              3, // large error range, in degrees
+//                                              500, // large error range timeout, in milliseconds
+//                                              0 // maximum acceleration (slew)
+// );
 
-// sensors for odometry
-lemlib::OdomSensors sensors(nullptr, 
-                            nullptr, 
-                            &horztrackingwheel,
-                            nullptr, 
-                            &imu // inertial sensor
-);
+// // sensors for odometry
+// lemlib::OdomSensors sensors(nullptr, 
+//                             nullptr, 
+//                             &horztrackingwheel,
+//                             nullptr, 
+//                             &imu // inertial sensor
+// );
 
 
 
-lemlib::Chassis chassis(yah, linearController, angularController, sensors);
+// lemlib::Chassis chassis(yah, linearController, angularController, sensors);
 
 
 
@@ -103,6 +104,11 @@ void on_center_button() {
  */
 void initialize() {
 	pros::lcd::initialize();
+	
+    
+    // Autonomous can perform additional actions here
+    // For example, delay to let the task run for a set period
+   
 	//master.clear();
 	//okJarvisActivateFunnyCatImageOnVexBrain();
 	left_mg.set_gearing(pros::E_MOTOR_GEAR_BLUE);
@@ -120,6 +126,7 @@ void initialize() {
 
 	//pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate();     // calibrate sensors
+ 
 
 
   //  pros::lcd::clear();
@@ -171,192 +178,289 @@ void competition_initialize() {}
  */
 
 
- bool intake_on = true;   
- bool intakerevdone = false;
+//  bool intake_on = true;   
+//  bool intakerevdone = false;
+//  bool preventReverse = true;
 
- void intakereverse(void* param) {
 
-    static int state = 1;
-    static int stateStartTime = 0;
+//  void intakereverse(void* param) {
 
-    const int normalVoltage = 12000;
-    const int reverseVoltage = -12000;
-    const int velocityThreshold = 10;
+//     static int state = 1;
+//     static int stateStartTime = 0;
 
-    while (true) {
-        int currentTime = pros::millis();
+//     const int normalVoltage = 12000;
+//     const int reverseVoltage = -12000;
+//     const int velocityThreshold = 10;
 
-        if (!intake_on) {
-            lift.move_voltage(0);
-        } else {
-            switch (state) {
-                case 1: 
-                    lift.move_voltage(normalVoltage);
-                    if (lift.get_actual_velocity() < velocityThreshold) {
-                        if (stateStartTime == 0) {
-                            stateStartTime = currentTime;
-                        }
-                        if (stateStartTime != 0 && (currentTime - stateStartTime >= 1000)) {
-                            state = 2;
-                            stateStartTime = currentTime;
-                        }
-                    }
-                    if (lift.get_actual_velocity() >= velocityThreshold) {
-                        stateStartTime = 0;
-                    }
-                    break;
+//     while (true) {
+//         int currentTime = pros::millis();
 
-                case 2:
-                    Intake2.move_voltage(reverseVoltage);
-                    if (currentTime - stateStartTime >= 1600) {
-                        state = 1;
-                        stateStartTime = currentTime;
-                    }
-                    break;
+//         if (!intake_on) {
+//             lift.move_voltage(0);
+//         } else {
+//             switch (state) {
+//                 case 1: 
+//                     lift.move_voltage(normalVoltage);
+//                     if (lift.get_actual_velocity() < velocityThreshold) {
+//                         if (stateStartTime == 0) {
+//                             stateStartTime = currentTime;
+//                         }
+//                         if (stateStartTime != 0 && (currentTime - stateStartTime >= 1000)) {
+//                             state = 2;
+//                             stateStartTime = currentTime;
+//                         }
+//                     }
+//                     if (lift.get_actual_velocity() >= velocityThreshold) {
+//                         stateStartTime = 0;
+//                     }
+//                     break;
 
-                case 3:  
-                    lift.move_voltage(normalVoltage);
-                    if (lift.get_actual_velocity() < velocityThreshold) {
-                        state = 2; 
-                        stateStartTime = currentTime;
-                    }
-                    if (lift.get_actual_velocity() >= velocityThreshold) {
-                        state = 1;  
-                        stateStartTime = 0;
-                    }
-                    break;
+//                 case 2:
+//                     Intake2.move_voltage(reverseVoltage);
+//                     if (currentTime - stateStartTime >= 1600) {
+//                         state = 1;
+//                         stateStartTime = currentTime;
+//                     }
+//                     break;
 
-                default:
-                    state = 1;
-                    stateStartTime = 0;
-                    break;
-            }
+//                 case 3:  
+//                     lift.move_voltage(normalVoltage);
+//                     if (lift.get_actual_velocity() < velocityThreshold) {
+//                         state = 2; 
+//                         stateStartTime = currentTime;
+//                     }
+//                     if (lift.get_actual_velocity() >= velocityThreshold) {
+//                         state = 1;  
+//                         stateStartTime = 0;
+//                     }
+//                     break;
 
-			if (intakerevdone) {
-				break ;
-        }
-        pros::delay(20);  
-    }
-}
- }
+//                 default:
+//                     state = 1;
+//                     stateStartTime = 0;
+//                     break;
+//             }
+
+// 			if (intakerevdone) {
+// 				break ;
+//         }
+//         pros::delay(20);  
+//     }
+// }
+//  }
 
 void autonomous() {
-	//auton();
+	//autonsupersafe();
+
+	skills();
 
 
-	pros::Task task(intakereverse, (void*)NULL);
-	bool intakeside = true;
-	bool clampside = false; 
+
+// 	pros::Task task(intakereverse, (void*)NULL);
+// 	bool intakeside = true;
+// 	bool clampside = false; 
 	
-	int intakeon = 12000;
-	int intakeoff = 0;
+// 	int intakeon = 12000;
+// 	int intakeoff = 0;
 	
-	bool clamp = true;
-	bool unclamp = false;
+// 	bool clamp = true;
+// 	bool unclamp = false;
 	
-	float max_v = 105;
-	float min_v = 0;
+// 	float max_v = 105;
+// 	float min_v = 0;
 	
-	int maxang_v = 70;
-	int minang_v = 1;
+// 	int maxang_v = 70;
+// 	int minang_v = 1;
 
-	int globalTimeout = 2900;
+// 	int globalTimeout = 2900;
 
 
 
-chassis.setPose({-59.823, 0, 90});
-	//score alliance stake
-	//lift.move_voltage(intakeon);
-	intake_on = true;
-	pros::delay(650);
-	chassis.moveToPose(-46.865, 0, 90, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v});
+// chassis.setPose({-59.823, 0, 90});
+// 	//score alliance stake
+// 	//lift.move_voltage(intakeon);
+// 	intake_on = true;
+// 	pros::delay(650);
+// 	chassis.moveToPose(-46.865, 0, 90, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v});
 	
-	chassis.turnToPoint(-46.865, -22.68, globalTimeout,{.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v, .earlyExitRange = 20});
-	//lift.move_voltage(intakeoff);
-	intake_on = false;
-	chassis.moveToPose(-46.865, -24.68, 0, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v});
-	chassis.waitUntilDone();
-	//  pros::delay(50);
-	piston.set_value(clamp); // clamp mogo
-	//lift.move_voltage(-12000);
-	pros::delay(100);
-	chassis.turnToPoint(-23.586, -23.74, globalTimeout,{.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
-	//start intake
-	//lift.move_voltage(intakeon);
-	intake_on = true;
+// 	chassis.turnToPoint(-46.865, -22.68, globalTimeout,{.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v, .earlyExitRange = 20});
+// 	//lift.move_voltage(intakeoff);
+// 	intake_on = false;
+// 	chassis.moveToPose(-46.865, -24.68, 0, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v});
+// 	chassis.waitUntilDone();
+// 	//  pros::delay(50);
+// 	piston.set_value(clamp); // clamp mogo
+// 	//lift.move_voltage(-12000);
+// 	pros::delay(100);
+// 	chassis.turnToPoint(-23.586, -23.74, globalTimeout,{.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
+// 	//start intake
+// 	//lift.move_voltage(intakeon);
+// 	intake_on = true;
 
-	chassis.moveToPose(-23.586, -23.74, 100, globalTimeout, { .forwards = intakeside, .lead=  -.2, .maxSpeed = 100  , .minSpeed = 60, .earlyExitRange = 1.5}); // score ring
-	//pros::delay(380);
-	chassis.moveToPose(-0.035, -38.833, 100, globalTimeout, {.forwards = intakeside, .lead = .38, .maxSpeed = 127, .minSpeed = 70}); // set up to score mogo
-	chassis.waitUntil(4);
-	chassis.cancelMotion();
-	/////////////////////////////////////////////
-	///LB ON//////////////
-	//////////////////////
-	
-	
-	chassis.moveToPoint(23.315, -47.274, globalTimeout, {.forwards = intakeside, .maxSpeed = 110.28, .minSpeed = 2}); // grab ring
-	pros::delay(100);
-	//lift.move_voltage(127);
+// 	chassis.moveToPose(-23.586, -23.74, 100, 1000, { .forwards = intakeside, .lead=  -.2, .maxSpeed = 100  , .minSpeed = 60, .earlyExitRange = 1.5}); // score ring
+// 	//pros::delay(380);
+// 	chassis.moveToPose(-0.035, -38.833, 100, globalTimeout, {.forwards = intakeside, .lead = .38, .maxSpeed = max_v, .minSpeed = min_v}); // set up to score mogo
+// 	chassis.waitUntil(4);
+// 	chassis.cancelMotion();
+// 	/////////////////////////////////////////////
+// 	///LB ON//////////////
+// 	//////////////////////
+// //	preventReverse = true;
+// 	//state = STATE_MID;
 
 
 
-
-	chassis.turnToPoint(0, -43.2, globalTimeout, {.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
-	chassis.moveToPoint(0, -43.2, globalTimeout,{.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v} ); //drive backwards 
-	
-	chassis.turnToPoint(0, -53.292, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = maxang_v});// grab score ring on mogo
-	// and score held ring on stake
-	
-	//pros::delay(300);
-	chassis.moveToPose(0, -55.292, 180, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // drive forwards
-	pros::delay(500);
-
-	chassis.moveToPose(0, -47.08, 180, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // reverse 
-	
-
-	//chassis.turnToHeading(270, globalTimeout, { .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
-	chassis.turnToPoint(-58.915, -47.08, 1000, {.maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face 3 ringss maybeeeeeeeeee ad back 20 exitrange
-	chassis.moveToPose(-58.915, -47.08, 270, 3500, {.maxSpeed = 125}); // score 3 rings change from mt 
-	chassis.waitUntil(11);
-	chassis.cancelMotion();
-	pros::delay(900);	
-	
-	//chassis.moveToPoint(-58.915, -47.08, 2500, {.maxSpeed = 75}); // score 3 rings change from mt 
-	chassis.moveToPose(-58.915,  -47.08, 270, 2500, {.maxSpeed = 75});
-
-
-	// chassis.moveToPoint(-48.915, -47.08, 1000, {.forwards = false , .maxSpeed = 127}); // score 3 rings change from mt 
-	// chassis.moveToPoint(-58.915, -47.08, 1000, {.maxSpeed = 127}); // score 3 rings change from mt 
-
-
-	chassis.moveToPoint(-48.915, -47.08, 1500, {.forwards = false , .maxSpeed = 127}); // score 3 rings change from mt 
-	chassis.moveToPoint(-58.915, -47.08, 1000, {.maxSpeed = 127}); // score 3 rings change from mt 
-
-
-
-	//chassis.turnToPoint(-47.208,-58.918, 1200, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
-	chassis.moveToPose(-43.208, -59.918, 135, 1200, {.forwards = intakeside, .maxSpeed = 90, .minSpeed = 10}); // score ring
 	
 	
-	
-	chassis.moveToPose(-31.112, -59.658, 90, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); //set up to put mogo in corner
+// 	chassis.moveToPoint(25.315, -44.274, globalTimeout, {.forwards = intakeside, .maxSpeed = 100.28, .minSpeed = 2}); // grab ring
+// 	pros::delay(100);
+// 	//lift.move_voltage(127);
 
-	chassis.moveToPose(-56.751, -59.658, 90, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 30}); // score mogo in corner
-	chassis.waitUntilDone();
-	pros::delay(400);
-	piston.set_value(unclamp); // unclamp mogo
-	//lift.move_voltage(intakeoff);
-	intake_on = false;
+
+
+
+// 	chassis.turnToPoint(0, -42.2, globalTimeout, {.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
+
+// 	chassis.moveToPoint(0, -42.2, globalTimeout,{.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v} ); //drive backwards 
+// 	//chassis.waitUntil(4);
+// 	//state = STATE_HOVER;
+	
+// 	//chassis.turnToPoint(0, -153.292, globalTimeout, {.forwards = intakeside, .maxSpeed = 60, .minSpeed = maxang_v});// grab score ring on mogo
+// 	// and score held ring on stake
+// 	//chassis.waitUntil(1);
+// 	//state = STATE_UP;
+
+// 	chassis.turnToHeading(180, 2000);
+
+
+
+
+
+
+
+// 	chassis.waitUntilDone();
+// 	pros::delay(600);
+
+
+// 	 chassis.moveToPose(0, -55.292, 180, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // drive forwards
+	
+
+// 	chassis.moveToPose(0, -47.08, 180, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = 10}); // reverse 
+// 	//state = STATE_DOWN;
+
+// 	chassis.turnToPoint(-58.915, -47.08, 1000, {.maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face 3 ringss maybeeeeeeeeee ad back 20 exitrange
+// 	chassis.moveToPose(-58.915, -47.08, 270, 3500, {.maxSpeed = 125}); // score 3 rings change from mt 
+// 	chassis.waitUntil(11);
+// 	chassis.cancelMotion();
+// 	pros::delay(900);	
+	
+// 	//preventReverse = false;
+	
+// 	chassis.moveToPose(-58.915,  -47.08, 270, 2500, {.maxSpeed = 75});
+
 
 	
-	// chassis.moveToPose(	-46.865	, 0, 0, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = 127, .minSpeed = 127}); 
-	// chassis.turnToHeading(-270, globalTimeout, { .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
-	// intake_on = false;
 
-	// chassis.moveToPose(-59.23, 0, 90, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = max_v, .minSpeed = min_v}); 
+// 	chassis.moveToPoint(-48.915, -47.08, 1500, {.forwards = false , .maxSpeed = 127}); // score 3 rings change from mt 
+// 	chassis.moveToPoint(-58.915, -47.08, 1000, {.maxSpeed = 127}); // score 3 rings change from mt 
+// 	//chassis.moveToPoint(-20.915, -47.08, 1500, {.forwards = false , .maxSpeed = 127}); // score 3 rings change from mt 
+
+
+
+// 	//chassis.moveToPose(-43.208, -59.918, 135, 1200, {.forwards = intakeside, .maxSpeed = 90, .minSpeed = 10}); // score ring
 	
 	
+	
+// 	chassis.moveToPose(-25.112, -59.658, 90, globalTimeout, {.forwards = intakeside, .maxSpeed = 60, .minSpeed = 50}); //set up to put mogo in corner
+// 	chassis.moveToPose(-20.112, -59.658, 90, globalTimeout, {.forwards = intakeside, .maxSpeed = 127, .minSpeed = 100});
+// 	chassis.moveToPose(-56.751, -59.658, 90, globalTimeout, {.forwards = clampside, .maxSpeed = 70, .minSpeed = 30}); // score mogo in corner
+// 	chassis.waitUntilDone();
+// 	pros::delay(400);
+// 	piston.set_value(unclamp); // unclamp mogo
+// 	//lift.move_voltage(intakeoff);
+// 	intake_on = false;
+
+	
+
+
+// // todo finish 2nd half 
+
+// 	chassis.moveToPose(	-46.865	, 0, 0, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = 105, .minSpeed = 0});  //clampmogo
+// 	pros::delay(600);
+// 	chassis.turnToPoint(-46.865, 25.934, globalTimeout, {.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
+	
+	
+	
+	
+	
+// 	chassis.waitUntilDone();
+// 	pros::delay(400);
+
+// 	chassis.moveToPoint(-46.865	, 22.934, 4000,{.forwards = clampside,  .maxSpeed = 50, .minSpeed = 0});  //clampmogo
+// 	chassis.waitUntilDone();
+// 	pros::delay(500);
+
+// 	piston.set_value(clamp); // clamp mogo
+// 	pros::delay(600);
+
+// 	chassis.turnToPoint(-23.343, 23.547, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
+// 	intake_on = true;
+// 	chassis.moveToPose(-23.343, 23.547, 80, globalTimeout, {.forwards = intakeside, .lead = -.3, .maxSpeed = 100, .minSpeed = 60}); // score ring
+// 	chassis.waitUntilDone();
+// 	pros::delay(500);
+	
+
+// 	chassis.moveToPose(-0.035, 38.833, 80, globalTimeout, {.forwards = intakeside, .lead = .38, .maxSpeed = max_v, .minSpeed = min_v}); // set up to score mogo
+// 	chassis.waitUntil(4);
+// 	chassis.cancelMotion();
+// 	chassis.moveToPoint(25.315, 44.274, globalTimeout, {.forwards = intakeside, .maxSpeed = 60, .minSpeed = 10}); //score far ring
+// 	chassis.waitUntilDone();
+// 	pros::delay(400);
+
+
+	
+ 
+// 	chassis.turnToPoint(-58.915,  47.08, 1000, {.maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face 3 ringss maybeeeeeeeeee ad back 20 exitrange
+// 	chassis.moveToPose(-58.915, 47.08, 270, 3500, {.maxSpeed = 125}); // score 3 rings change from mt 
+// 	chassis.waitUntil(11);
+// 	chassis.cancelMotion();
+// 	pros::delay(900);	
+	
+// 	chassis.moveToPose(-58.915,  47.08, 270, 2500, {.maxSpeed = 75});
+
+
+// 	chassis.moveToPoint(-48.915, 47.08, 1500, {.forwards = false , .maxSpeed = 127}); // score 3 rings change from mt 
+// 	chassis.moveToPoint(-58.915, 47.08, 1000, {.maxSpeed = 127}); // score 3 rings change from mt 
+
+
+
+// 	chassis.moveToPose(-43.208, 61.918, 225, 1200, {.forwards = intakeside, .lead = -.3, .maxSpeed = 90, .minSpeed = 10}); // score ring
+	
+	
+	
+// 	chassis.moveToPose(-31.112, 61.658, 90, globalTimeout, {.forwards = intakeside, .lead = .3, .maxSpeed = max_v, .minSpeed = min_v}); //set up to put mogo in corner
+
+// 	chassis.moveToPose(-60.751, 62.658, 90, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 30}); // score mogo in corner
+// 	chassis.waitUntilDone();
+// 	pros::delay(400);
+// 	piston.set_value(unclamp); // unclamp mogo
+// 	//lift.move_voltage(intakeoff);
+// 	intake_on = false;
+// 	chassis.moveToPose(-60.751, 62.658, 90, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 30}); // score mogo in corner
+
+// 	chassis.moveToPose(57.862, 24.57, 125, 7000,{.forwards = clampside, .maxSpeed = 40, .minSpeed = 0}); // score ring
+// 	chassis.waitUntilDone();
+// 	pros::delay(500);
+
+// 	piston.set_value(clamp); // clamp mogo
+// 	pros::delay(600);
+
+// 	chassis.moveToPose(-60.751, 62.658, 0, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 30}); // score mogo in corner
+// 	chassis.moveToPose(-60.751, 62.658, 0, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 30}); // score mogo in corner
+
+
+
+
 
 
 }
@@ -379,13 +483,15 @@ void opcontrol() {
  	bool reversedSteering;
 	///encoder.set_position(1000);
 	intakerevdone = true;
+	pros::Task redirectTask(RedirectControl, (void*)NULL);
+
 	
 
 	while (true) {
 		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
 		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
 		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  // Prints status of the emulated screen LCDs
-
+						 updateStateFromInput();
 		// Arcade; control scheme
 		int dir = master.get_analog(ANALOG_LEFT_Y);    // Gets amount forward/backward from left joystick
 		int turn = master.get_analog(ANALOG_RIGHT_X);  // Gets the turn left/right from right joystick
@@ -411,13 +517,10 @@ void opcontrol() {
 		*/
 		clampSolenoid();
 		rollerControl();
-		RedirectControl();
-		/*if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)){
-			lift.move(-127);
-		}
-		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)){
-			lift.move(127);
-		}*/
+		updateStateFromInput();
+	//	RedirectControl();
+
+	 
 		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_Y)){
 			lift.move(0);
 		}
