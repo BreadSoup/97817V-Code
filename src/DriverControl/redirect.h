@@ -66,7 +66,7 @@ inline void RedirectControl() {
     } 
     else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) {
         // Setting target position when LEFT button is pressed
-        target_position = 42;
+        target_position = 50;
         manual_control = false;
         moving_to_600 = false;
         moving_back_to_0 = false;
@@ -79,7 +79,15 @@ inline void RedirectControl() {
     else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
         // Setting target position when UP button is pressed
         target_position = 140;
-        lift.move(-100);
+        
+        for (int i = 0; i < 4; ++i) {
+            lift.move_voltage(12000);
+            pros::delay(100);
+            lift.move(0);
+            pros::delay(60);
+        }
+        lift.move_voltage(-12000);
+        pros::delay(30);
         lift.move(0);
         moving_back_to_0 = false;
     
