@@ -483,7 +483,7 @@ void opcontrol() {
  	bool reversedSteering;
 	///encoder.set_position(1000);
 	intakerevdone = true;
-	pros::Task redirectTask(RedirectControl, (void*)NULL);
+	//pros::Task redirectTask(RedirectControl, (void*)NULL);
 
 	
 
@@ -518,6 +518,7 @@ void opcontrol() {
 		clampSolenoid();
 		rollerControl();
 		updateStateFromInput();
+		RedirectControl();
 	//	RedirectControl();
 
 	 

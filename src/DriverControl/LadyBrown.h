@@ -84,9 +84,9 @@ inline void updateStateFromInput() {
 
 }
 
-inline void RedirectControl(void *param) {
+inline void RedirectControl() {
 
-while (true) {
+//while (true) {
 
     // Fetch encoder position
     double rotation_position = encoder.get_position()/100;
@@ -98,11 +98,9 @@ while (true) {
  
     switch (state) {
         case STATE_UP:
-                target_position = UP;
-                if (prevstate == STATE_MID)
-                {         
+                target_position = UP;       
                     jamRing();
-                }
+                
             break;
         case STATE_MID:
                 target_position = MID;
@@ -123,7 +121,7 @@ while (true) {
                     previous_error = 0;
                     integral = 0;
                     pros::delay(20);
-                    continue;;
+                    //continue;;
             case STATE_UPDOWN:
                 state = STATE_UP;
                 pros::delay(1000);
@@ -167,4 +165,4 @@ while (true) {
         previous_error = error;
 
 }
-}
+//}
