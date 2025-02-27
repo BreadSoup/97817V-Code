@@ -87,20 +87,24 @@ inline void updateStateFromInput() {
 inline void RedirectControl() {
 
 //while (true) {
+    static bool ranjam = false;
 
     // Fetch encoder position
     double rotation_position = encoder.get_position()/100;
 
     pros::lcd::set_text(5, "Rotation: " + std::to_string(rotation_position));
     pros::lcd::set_text(6, "Target: " + std::to_string(target_position));
+    if (state != STATE_UP) {
+        ranjam = false;
+    }
 
-
- 
     switch (state) {
         case STATE_UP:
-                target_position = UP;       
-                    jamRing();
-                
+             if (ranjam == false){
+                jamRing();
+                ranjam = true;
+             }
+            target_position = UP;       
             break;
         case STATE_MID:
                 target_position = MID;
@@ -120,21 +124,20 @@ inline void RedirectControl() {
                         Redriect.move_voltage(0);
                     previous_error = 0;
                     integral = 0;
-                    pros::delay(20);
-                    //continue;;
-            case STATE_UPDOWN:
-                state = STATE_UP;
-                pros::delay(1000);
-                if (state != STATE_UPDOWN)
-                    state = prevstate;
-                else
-                    state = STATE_DOWN;
-                break;
+                     return;
+            // case STATE_UPDOWN:
+            //     state = STATE_UP;
+            //     pros::delay(1000);
+            //     if (state != STATE_UPDOWN)
+            //         state = prevstate;
+            //     else
+            //         state = STATE_DOWN;
+            //     break;
 
-            case STATE_HOVER:
-                jamRing();
-                target_position = HOVER;
-                break;
+            // case STATE_HOVER:
+            //     jamRing();
+            //     target_position = HOVER;
+            //     break;
                 
         default:
             state = STATE_DOWN;
