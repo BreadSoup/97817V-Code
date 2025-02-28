@@ -14,96 +14,206 @@
 #include "pros/rtos.h"
 #include "pros/screen.hpp"
 #include "lemlib/api.hpp" 
-#include <cstdlib> // Include the cstdlib header for rand() and srand()
+#include <cstdlib> 
 #include <ctime> 
-
-//#include "pros/motor_group.hpp"
-
-//ASSET(bluestep2_txt); 
-//ASSET(red2_txt); 
-//ASSET(red3_txt); 
+#include "main.h"
+ #include <stdio.h>
 
 
-//ASSET(bluestep5_txt);
-//ASSET(bluestep7_txt); 
-//ASSET(drakept1_txt);
+ #include <vector>
+ #include <string>
 
-// pros::Imu imu(8); 
-// pros::MotorGroup leftm({-18, -17, -13});
-// pros::MotorGroup rightm({15, 19, 9});
-// lemlib::TrackingWheel horztrackingwheel(&horztracking, lemlib::Omniwheel::NEW_275, -1.5);
-// // ---------------------- LemLib Setup ----------------------
+ // todo fix ports
+ std::vector<int> motorPorts = { -1, -2, -3, 4, 5, 6, -10, -20 };
 
-// lemlib::Drivetrain yah(&leftm, // left motor group
-//                               &rightm, // right motor group
-//                               12.5,
-//                               lemlib::Omniwheel::NEW_325, 
-//                               450, 
-//                               2 // horizontal drift is 2. If we had traction wheels, it would have been 8
-// );
-// lemlib::ControllerSettings linearController(10.25, // proportional gain (kP)
-//                                             0, // integral gain (kI)
-//                                             3, // derivative gain (kD)
-//                                             3, // anti windup
-//                                             1, // small error range, in inches
-//                                             100, // small error range timeout, in milliseconds
-//                                             3, // large error range, in inches
-//                                             500, // large error range timeout, in milliseconds
-//                                             20 // maximum acceleration (slew)              // was 20 
-// );
+std::vector<lv_obj_t*> motorLabels;  
+lv_obj_t* batteryLabel = nullptr;
+lv_obj_t* teamImageObj = nullptr;
 
-// // angular motion controller
-// lemlib::ControllerSettings angularController(1.85, // proportional gain (kP)
-//                                              0, // integral gain (kI)
-//                                              14.5, // derivative gain (kD // was 10)
-//                                              3, // anti windup
-//                                              1, // small error range, in degrees
-//                                              100, // small error range timeout, in milliseconds
-//                                              3, // large error range, in degrees
-//                                              500, // large error range timeout, in milliseconds
-//                                              0 // maximum acceleration (slew)
-// );
+// ---------------------- New Global UI Elements ----------------------
+// Global cycle number and its label
+static int cycle_number = 0;
+static lv_obj_t* cycle_label = nullptr;
 
-// // sensors for odometry
-// lemlib::OdomSensors sensors(nullptr, 
-//                             nullptr, 
-//                             &horztrackingwheel,
-//                             nullptr, 
-//                             &imu // inertial sensor
-// );
-
-
-
-// lemlib::Chassis chassis(yah, linearController, angularController, sensors);
-
-
-
-//LV_IMG_DECLARE(awesome);
-//lv_obj_t* awesome_obj = NULL;
-
-/**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
-	}
+// ---------------------- LVGL Callback Functions ----------------------
+static void bg_anim_cb(void* var, int32_t v) {
+    lv_obj_t* obj = static_cast<lv_obj_t*>(var);
+    // Orange color animation: (v, v/2, 0)
+    lv_color_t color = lv_color_make(v, v / 2, 0);
+    lv_obj_set_style_bg_color(obj, color, LV_PART_MAIN | LV_STATE_DEFAULT);
 }
-/**
- * Runs initialization code. This occurs as soon as the program is started.
- *
- * All other competition modes are blocked by initialize; it is recommended
- * to keep execution time for this mode under a few seconds.
- */
+
+static void set_opa_cb(void* var, int32_t v) {
+    lv_obj_set_style_opa(static_cast<lv_obj_t*>(var), v, LV_PART_MAIN | LV_STATE_DEFAULT);
+}
+
+// ---------------------- Button Event Callbacks ----------------------
+static void btn_plus_event_cb(lv_event_t* e) {
+    cycle_number++;
+    char buf[16];
+    sprintf(buf, "%d", cycle_number);
+    lv_label_set_text(cycle_label, buf);
+}
+
+static void btn_minus_event_cb(lv_event_t* e) {
+    cycle_number--;
+    char buf[16];
+    sprintf(buf, "%d", cycle_number);
+    lv_label_set_text(cycle_label, buf);
+}
+
+// ---------------------- LVGL Setup Function ----------------------
+void setup_lcd() {
+    srand(time(NULL));
+    lv_obj_t* scr = lv_scr_act();
+
+    // ---------------------- Background Setup ----------------------
+    static lv_style_t bgStyle;
+    lv_style_init(&bgStyle);
+    lv_style_set_bg_color(&bgStyle, lv_color_make(0xFF, 0x66, 0x00));           // VLC Orange
+    lv_style_set_bg_grad_color(&bgStyle, lv_color_make(0xFF, 0x66, 0x00));      // VLC Orange gradient
+    lv_style_set_bg_grad_dir(&bgStyle, LV_GRAD_DIR_VER);                       // Vertical gradient
+    lv_obj_add_style(scr, &bgStyle, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // ---------------------- Background Animation ----------------------
+    static lv_anim_t bgAnim;
+    lv_anim_init(&bgAnim);
+    lv_anim_set_var(&bgAnim, scr);
+    lv_anim_set_values(&bgAnim, 0, 255);        // Animate orange value from 0 to 255
+    lv_anim_set_time(&bgAnim, 10000);           // Duration of 10 seconds
+    lv_anim_set_playback_time(&bgAnim, 10000);  // Same for playback
+    lv_anim_set_repeat_count(&bgAnim, LV_ANIM_REPEAT_INFINITE);
+    lv_anim_set_exec_cb(&bgAnim, bg_anim_cb);
+    lv_anim_set_path_cb(&bgAnim, lv_anim_path_linear);
+    lv_anim_start(&bgAnim);
+
+    // ---------------------- Motor Labels Setup ----------------------
+    // Resize our vector to match the number of motor ports.
+    motorLabels.resize(motorPorts.size());
+    
+    static lv_style_t motorLabelStyle;
+    lv_style_init(&motorLabelStyle);
+    lv_style_set_text_color(&motorLabelStyle, lv_color_white());
+    lv_style_set_text_font(&motorLabelStyle, &lv_font_montserrat_12);
+    lv_style_set_radius(&motorLabelStyle, 8);  // Rounded corners
+
+    // Create a label for each motor based on the ports in our vector.
+    for (size_t i = 0; i < motorPorts.size(); ++i) {
+        motorLabels[i] = lv_label_create(scr);
+        std::string initialText = "Motor " + std::to_string(motorPorts[i]) + ": Initializing...";
+        lv_label_set_text(motorLabels[i], initialText.c_str());
+        lv_obj_add_style(motorLabels[i], &motorLabelStyle, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_pos(motorLabels[i], 10, 40 + (i * 25)); // Position each label vertically
+
+        // Fade-in animation for the label:
+        static lv_anim_t motorFadeAnim;  // Using a single anim instance for simplicity
+        lv_anim_init(&motorFadeAnim);
+        lv_anim_set_var(&motorFadeAnim, motorLabels[i]);
+        lv_anim_set_values(&motorFadeAnim, 0, LV_OPA_COVER);
+        lv_anim_set_time(&motorFadeAnim, 1000);
+        lv_anim_set_exec_cb(&motorFadeAnim, set_opa_cb);
+        lv_anim_set_path_cb(&motorFadeAnim, lv_anim_path_ease_in);
+        lv_anim_start(&motorFadeAnim);
+    }
+ 
+    // ---------------------- Battery Label Setup ----------------------
+    static lv_style_t batteryStyle;
+    lv_style_init(&batteryStyle);
+    lv_style_set_text_color(&batteryStyle, lv_color_white());
+    lv_style_set_text_font(&batteryStyle, &lv_font_montserrat_20);
+    lv_style_set_radius(&batteryStyle, 10);
+    lv_style_set_bg_color(&batteryStyle, lv_color_make(0x00, 0xFF, 0x00));        
+    lv_style_set_bg_grad_color(&batteryStyle, lv_color_make(0x00, 0x80, 0x00));    
+    lv_style_set_bg_grad_dir(&batteryStyle, LV_GRAD_DIR_VER);
+ 
+    batteryLabel = lv_label_create(scr);
+    lv_label_set_text(batteryLabel, "Battery: ");
+    lv_obj_add_style(batteryLabel, &batteryStyle, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_pos(batteryLabel, 190, 10);
+ 
+    // ---------------------- Team Name Image Setup ----------------------
+    teamImageObj = lv_img_create(scr);
+    // If you have an image asset for the team logo, uncomment the following line:
+    // lv_img_set_src(teamImageObj, &Team);
+    lv_obj_align(teamImageObj, LV_ALIGN_BOTTOM_RIGHT, 0, -10);
+
+    // ---------------------- Cycle Number and Button Setup ----------------------
+    // Create the cycle number label positioned above the buttons
+    cycle_label = lv_label_create(scr);
+    lv_label_set_text(cycle_label, "0");
+    lv_obj_align(cycle_label, LV_ALIGN_BOTTOM_RIGHT, -40, -80);  // Adjust offsets as needed
+
+    // Create the plus button
+    lv_obj_t* btn_plus = lv_btn_create(scr);
+    lv_obj_set_size(btn_plus, 30, 30);  // Tiny button size
+    lv_obj_align(btn_plus, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+    lv_obj_set_style_bg_color(btn_plus, lv_color_black(), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(btn_plus, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_add_event_cb(btn_plus, btn_plus_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_t* label_plus = lv_label_create(btn_plus);
+    lv_label_set_text(label_plus, "+");
+    lv_obj_center(label_plus);
+
+    // Create the minus button
+    lv_obj_t* btn_minus = lv_btn_create(scr);
+    lv_obj_set_size(btn_minus, 30, 30);
+    lv_obj_align(btn_minus, LV_ALIGN_BOTTOM_RIGHT, -50, -10);  // Positioned to the left of plus
+    lv_obj_set_style_bg_color(btn_minus, lv_color_black(), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(btn_minus, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_add_event_cb(btn_minus, btn_minus_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_t* label_minus = lv_label_create(btn_minus);
+    lv_label_set_text(label_minus, "-");
+    lv_obj_center(label_minus);
+}
+ 
+std::vector<pros::Motor> motors = {
+    pros::Motor(motorPorts[0], pros::v5::MotorGears::blue),
+    pros::Motor(motorPorts[1], pros::v5::MotorGears::blue),
+    pros::Motor(motorPorts[2], pros::v5::MotorGears::blue),
+    pros::Motor(motorPorts[3], pros::v5::MotorGears::blue),
+    pros::Motor(motorPorts[4], pros::v5::MotorGears::blue),
+    pros::Motor(motorPorts[5], pros::v5::MotorGears::blue),
+    pros::Motor(motorPorts[6], pros::v5::MotorGears::blue),
+    pros::Motor(motorPorts[7], pros::v5::MotorGears::blue)
+};
+
+void update_motor_data() {
+    // Loop over the vector of motor ports (which defines the number of motors)
+    for (size_t i = 0; i < motorPorts.size(); ++i) {
+        double temp = motors[i].get_temperature();         // Temperature in °C
+        double rpm = motors[i].get_actual_velocity();        // RPM
+        double current_draw = motors[i].get_current_draw();    // Current draw in Amps
+        double relative_pos = motors[i].get_position();        // Relative position
+
+        // Check if any data is invalid (e.g., if the motor is unplugged)
+        bool unplugged = std::isinf(temp) || std::isinf(rpm) || std::isinf(current_draw) || std::isinf(relative_pos);
+
+        std::string display_str;
+        if (unplugged) {
+            display_str = "Motor " + std::to_string(motorPorts[i]) + ": Unplugged";
+        } else {
+            display_str = "Motor " + std::to_string(motorPorts[i]) + ": ";
+            display_str += std::to_string(temp) + "°C | ";
+            display_str += std::to_string(static_cast<int>(rpm)) + " RPM | ";
+            display_str += std::to_string(current_draw) + "A | ";
+            display_str += std::to_string(static_cast<int>(relative_pos));
+        }
+
+        // Update the corresponding LVGL label from our vector
+        lv_label_set_text(motorLabels[i], display_str.c_str());
+    }
+
+    // Update battery percentage using the global battery label
+    int battery_percent = pros::battery::get_capacity(); 
+    std::string battery_str = "Battery: " + std::to_string(battery_percent) + "%";
+    lv_label_set_text(batteryLabel, battery_str.c_str());
+
+    // Process LVGL tasks
+    lv_task_handler();
+}
+ 
 void initialize() {
-	pros::lcd::initialize();
+	//pros::lcd::initialize();
 	
     
     // Autonomous can perform additional actions here
@@ -118,28 +228,41 @@ void initialize() {
 	encoder.reset(); 
 	encoder.reset_position();
 	encoder.set_position(1000);
+	pros::lcd::clear();
+
 
 	intializePneumatics();
+	lv_init();
+	setup_lcd();
+
+    // Setup our custom interface.
 
 	//encoder.reset();
 
 
 	//pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate();     // calibrate sensors
+	
  
 
 
-  //  pros::lcd::clear();
+    pros::lcd::clear();
+  //pros::Task autoTask(autoSelectorTask, (void*)NULL);
 
     // thread to for brain screen and position logging
      pros::Task screenTask([&]() {
       while (true) {
+			
            // print robot location to the brain screen
-           pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
-           pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
-           pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
-		   pros::lcd::print(3, "horz: %i", horztracking.get_position());
-           // log position telemetry
+     chassis.getPose().x; // x
+          chassis.getPose().y; // y
+          chassis.getPose().theta; // heading
+		  lv_task_handler(); // Process LVGL tasks
+		  update_motor_data();
+
+
+		///   pros::lcd::printf(3, "horz: %i", horztracking.get_position());
+		   // log position telemetry
            lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
            // delay to save resources
            pros::delay(20);
@@ -178,289 +301,12 @@ void competition_initialize() {}
  */
 
 
-//  bool intake_on = true;   
-//  bool intakerevdone = false;
-//  bool preventReverse = true;
-
-
-//  void intakereverse(void* param) {
-
-//     static int state = 1;
-//     static int stateStartTime = 0;
-
-//     const int normalVoltage = 12000;
-//     const int reverseVoltage = -12000;
-//     const int velocityThreshold = 10;
-
-//     while (true) {
-//         int currentTime = pros::millis();
-
-//         if (!intake_on) {
-//             lift.move_voltage(0);
-//         } else {
-//             switch (state) {
-//                 case 1: 
-//                     lift.move_voltage(normalVoltage);
-//                     if (lift.get_actual_velocity() < velocityThreshold) {
-//                         if (stateStartTime == 0) {
-//                             stateStartTime = currentTime;
-//                         }
-//                         if (stateStartTime != 0 && (currentTime - stateStartTime >= 1000)) {
-//                             state = 2;
-//                             stateStartTime = currentTime;
-//                         }
-//                     }
-//                     if (lift.get_actual_velocity() >= velocityThreshold) {
-//                         stateStartTime = 0;
-//                     }
-//                     break;
-
-//                 case 2:
-//                     Intake2.move_voltage(reverseVoltage);
-//                     if (currentTime - stateStartTime >= 1600) {
-//                         state = 1;
-//                         stateStartTime = currentTime;
-//                     }
-//                     break;
-
-//                 case 3:  
-//                     lift.move_voltage(normalVoltage);
-//                     if (lift.get_actual_velocity() < velocityThreshold) {
-//                         state = 2; 
-//                         stateStartTime = currentTime;
-//                     }
-//                     if (lift.get_actual_velocity() >= velocityThreshold) {
-//                         state = 1;  
-//                         stateStartTime = 0;
-//                     }
-//                     break;
-
-//                 default:
-//                     state = 1;
-//                     stateStartTime = 0;
-//                     break;
-//             }
-
-// 			if (intakerevdone) {
-// 				break ;
-//         }
-//         pros::delay(20);  
-//     }
-// }
-//  }
-
 void autonomous() {
 	//autonsupersafe();
 
 	skills();
 
-
-
-// 	pros::Task task(intakereverse, (void*)NULL);
-// 	bool intakeside = true;
-// 	bool clampside = false; 
-	
-// 	int intakeon = 12000;
-// 	int intakeoff = 0;
-	
-// 	bool clamp = true;
-// 	bool unclamp = false;
-	
-// 	float max_v = 105;
-// 	float min_v = 0;
-	
-// 	int maxang_v = 70;
-// 	int minang_v = 1;
-
-// 	int globalTimeout = 2900;
-
-
-
-// chassis.setPose({-59.823, 0, 90});
-// 	//score alliance stake
-// 	//lift.move_voltage(intakeon);
-// 	intake_on = true;
-// 	pros::delay(650);
-// 	chassis.moveToPose(-46.865, 0, 90, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v});
-	
-// 	chassis.turnToPoint(-46.865, -22.68, globalTimeout,{.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v, .earlyExitRange = 20});
-// 	//lift.move_voltage(intakeoff);
-// 	intake_on = false;
-// 	chassis.moveToPose(-46.865, -24.68, 0, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v});
-// 	chassis.waitUntilDone();
-// 	//  pros::delay(50);
-// 	piston.set_value(clamp); // clamp mogo
-// 	//lift.move_voltage(-12000);
-// 	pros::delay(100);
-// 	chassis.turnToPoint(-23.586, -23.74, globalTimeout,{.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
-// 	//start intake
-// 	//lift.move_voltage(intakeon);
-// 	intake_on = true;
-
-// 	chassis.moveToPose(-23.586, -23.74, 100, 1000, { .forwards = intakeside, .lead=  -.2, .maxSpeed = 100  , .minSpeed = 60, .earlyExitRange = 1.5}); // score ring
-// 	//pros::delay(380);
-// 	chassis.moveToPose(-0.035, -38.833, 100, globalTimeout, {.forwards = intakeside, .lead = .38, .maxSpeed = max_v, .minSpeed = min_v}); // set up to score mogo
-// 	chassis.waitUntil(4);
-// 	chassis.cancelMotion();
-// 	/////////////////////////////////////////////
-// 	///LB ON//////////////
-// 	//////////////////////
-// //	preventReverse = true;
-// 	//state = STATE_MID;
-
-
-
-	
-	
-// 	chassis.moveToPoint(25.315, -44.274, globalTimeout, {.forwards = intakeside, .maxSpeed = 100.28, .minSpeed = 2}); // grab ring
-// 	pros::delay(100);
-// 	//lift.move_voltage(127);
-
-
-
-
-// 	chassis.turnToPoint(0, -42.2, globalTimeout, {.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face goal
-
-// 	chassis.moveToPoint(0, -42.2, globalTimeout,{.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v} ); //drive backwards 
-// 	//chassis.waitUntil(4);
-// 	//state = STATE_HOVER;
-	
-// 	//chassis.turnToPoint(0, -153.292, globalTimeout, {.forwards = intakeside, .maxSpeed = 60, .minSpeed = maxang_v});// grab score ring on mogo
-// 	// and score held ring on stake
-// 	//chassis.waitUntil(1);
-// 	//state = STATE_UP;
-
-// 	chassis.turnToHeading(180, 2000);
-
-
-
-
-
-
-
-// 	chassis.waitUntilDone();
-// 	pros::delay(600);
-
-
-// 	 chassis.moveToPose(0, -55.292, 180, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // drive forwards
-	
-
-// 	chassis.moveToPose(0, -47.08, 180, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = 10}); // reverse 
-// 	//state = STATE_DOWN;
-
-// 	chassis.turnToPoint(-58.915, -47.08, 1000, {.maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face 3 ringss maybeeeeeeeeee ad back 20 exitrange
-// 	chassis.moveToPose(-58.915, -47.08, 270, 3500, {.maxSpeed = 125}); // score 3 rings change from mt 
-// 	chassis.waitUntil(11);
-// 	chassis.cancelMotion();
-// 	pros::delay(900);	
-	
-// 	//preventReverse = false;
-	
-// 	chassis.moveToPose(-58.915,  -47.08, 270, 2500, {.maxSpeed = 75});
-
-
-	
-
-// 	chassis.moveToPoint(-48.915, -47.08, 1500, {.forwards = false , .maxSpeed = 127}); // score 3 rings change from mt 
-// 	chassis.moveToPoint(-58.915, -47.08, 1000, {.maxSpeed = 127}); // score 3 rings change from mt 
-// 	//chassis.moveToPoint(-20.915, -47.08, 1500, {.forwards = false , .maxSpeed = 127}); // score 3 rings change from mt 
-
-
-
-// 	//chassis.moveToPose(-43.208, -59.918, 135, 1200, {.forwards = intakeside, .maxSpeed = 90, .minSpeed = 10}); // score ring
-	
-	
-	
-// 	chassis.moveToPose(-25.112, -59.658, 90, globalTimeout, {.forwards = intakeside, .maxSpeed = 60, .minSpeed = 50}); //set up to put mogo in corner
-// 	chassis.moveToPose(-20.112, -59.658, 90, globalTimeout, {.forwards = intakeside, .maxSpeed = 127, .minSpeed = 100});
-// 	chassis.moveToPose(-56.751, -59.658, 90, globalTimeout, {.forwards = clampside, .maxSpeed = 70, .minSpeed = 30}); // score mogo in corner
-// 	chassis.waitUntilDone();
-// 	pros::delay(400);
-// 	piston.set_value(unclamp); // unclamp mogo
-// 	//lift.move_voltage(intakeoff);
-// 	intake_on = false;
-
-	
-
-
-// // todo finish 2nd half 
-
-// 	chassis.moveToPose(	-46.865	, 0, 0, globalTimeout,{.forwards = intakeside, .lead = -.1, .maxSpeed = 105, .minSpeed = 0});  //clampmogo
-// 	pros::delay(600);
-// 	chassis.turnToPoint(-46.865, 25.934, globalTimeout, {.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
-	
-	
-	
-	
-	
-// 	chassis.waitUntilDone();
-// 	pros::delay(400);
-
-// 	chassis.moveToPoint(-46.865	, 22.934, 4000,{.forwards = clampside,  .maxSpeed = 50, .minSpeed = 0});  //clampmogo
-// 	chassis.waitUntilDone();
-// 	pros::delay(500);
-
-// 	piston.set_value(clamp); // clamp mogo
-// 	pros::delay(600);
-
-// 	chassis.turnToPoint(-23.343, 23.547, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
-// 	intake_on = true;
-// 	chassis.moveToPose(-23.343, 23.547, 80, globalTimeout, {.forwards = intakeside, .lead = -.3, .maxSpeed = 100, .minSpeed = 60}); // score ring
-// 	chassis.waitUntilDone();
-// 	pros::delay(500);
-	
-
-// 	chassis.moveToPose(-0.035, 38.833, 80, globalTimeout, {.forwards = intakeside, .lead = .38, .maxSpeed = max_v, .minSpeed = min_v}); // set up to score mogo
-// 	chassis.waitUntil(4);
-// 	chassis.cancelMotion();
-// 	chassis.moveToPoint(25.315, 44.274, globalTimeout, {.forwards = intakeside, .maxSpeed = 60, .minSpeed = 10}); //score far ring
-// 	chassis.waitUntilDone();
-// 	pros::delay(400);
-
-
-	
  
-// 	chassis.turnToPoint(-58.915,  47.08, 1000, {.maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face 3 ringss maybeeeeeeeeee ad back 20 exitrange
-// 	chassis.moveToPose(-58.915, 47.08, 270, 3500, {.maxSpeed = 125}); // score 3 rings change from mt 
-// 	chassis.waitUntil(11);
-// 	chassis.cancelMotion();
-// 	pros::delay(900);	
-	
-// 	chassis.moveToPose(-58.915,  47.08, 270, 2500, {.maxSpeed = 75});
-
-
-// 	chassis.moveToPoint(-48.915, 47.08, 1500, {.forwards = false , .maxSpeed = 127}); // score 3 rings change from mt 
-// 	chassis.moveToPoint(-58.915, 47.08, 1000, {.maxSpeed = 127}); // score 3 rings change from mt 
-
-
-
-// 	chassis.moveToPose(-43.208, 61.918, 225, 1200, {.forwards = intakeside, .lead = -.3, .maxSpeed = 90, .minSpeed = 10}); // score ring
-	
-	
-	
-// 	chassis.moveToPose(-31.112, 61.658, 90, globalTimeout, {.forwards = intakeside, .lead = .3, .maxSpeed = max_v, .minSpeed = min_v}); //set up to put mogo in corner
-
-// 	chassis.moveToPose(-60.751, 62.658, 90, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 30}); // score mogo in corner
-// 	chassis.waitUntilDone();
-// 	pros::delay(400);
-// 	piston.set_value(unclamp); // unclamp mogo
-// 	//lift.move_voltage(intakeoff);
-// 	intake_on = false;
-// 	chassis.moveToPose(-60.751, 62.658, 90, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 30}); // score mogo in corner
-
-// 	chassis.moveToPose(57.862, 24.57, 125, 7000,{.forwards = clampside, .maxSpeed = 40, .minSpeed = 0}); // score ring
-// 	chassis.waitUntilDone();
-// 	pros::delay(500);
-
-// 	piston.set_value(clamp); // clamp mogo
-// 	pros::delay(600);
-
-// 	chassis.moveToPose(-60.751, 62.658, 0, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 30}); // score mogo in corner
-// 	chassis.moveToPose(-60.751, 62.658, 0, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 30}); // score mogo in corner
-
-
-
-
 
 
 }
@@ -483,7 +329,10 @@ void opcontrol() {
  	bool reversedSteering;
 	///encoder.set_position(1000);
 	intakerevdone = true;
+    
 	//pros::Task redirectTask(RedirectControl, (void*)NULL);
+
+	lv_task_handler();
 
 	
 
