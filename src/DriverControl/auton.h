@@ -355,7 +355,7 @@ chassis.setPose({-59.823, 0, 90});
     pros::delay(300);
 	piston.set_value(unclamp); 
 
-	chassis.moveToPose(57.248, 20.07, 0,  3000,{.forwards = clampside, .maxSpeed = 110, .minSpeed = 100}); 
+	chassis.moveToPose(57.248, 20.07, 0,                              3000,{.forwards = clampside, .maxSpeed = 110, .minSpeed = 100}); 
 
     chassis.moveToPose(60.751, 62.658, 0, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 100}); // score mogo in corner
 
