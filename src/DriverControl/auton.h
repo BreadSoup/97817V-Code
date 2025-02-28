@@ -256,7 +256,7 @@ chassis.setPose({-59.823, 0, 90});
 	//pros::delay(500);
 	
 
-	chassis.moveToPose(-0.035, 38.833, 75, globalTimeout, {.forwards = intakeside, .lead = -.05, .maxSpeed = max_v, .minSpeed = min_v}); // set up to score mogo
+	chassis.moveToPose(-0.035, 38.833, 60, globalTimeout, {.forwards = intakeside, .lead = -.05, .maxSpeed = max_v, .minSpeed = min_v}); // set up to score mogo
 	chassis.waitUntil(4);
 	chassis.cancelMotion();
 	chassis.moveToPoint(25.315, 44.274, globalTimeout, {.forwards = intakeside, .maxSpeed = 60, .minSpeed = 10}); //score far ring
