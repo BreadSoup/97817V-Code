@@ -20,7 +20,8 @@ inline void intakereverse(void* param) {
        int currentTime = pros::millis();
 
        if (!intake_on) {
-           lift.move_voltage(0);
+           Intake2.move_voltage(0);
+           Intake1.move_voltage(12000);
        } else {
            switch (state) {
                case 1: 
@@ -240,23 +241,22 @@ chassis.setPose({-59.823, 0, 90});
 	
 	
 	chassis.waitUntilDone();
-	pros::delay(400);
 
-	chassis.moveToPoint(-46.865	, 22.934, 4000,{.forwards = clampside,  .maxSpeed = 50, .minSpeed = 0});  //clampmogo
+	chassis.moveToPoint(-46.865	, 22.934, 4000,{.forwards = clampside,  .maxSpeed = 45, .minSpeed = 0});  //clampmogo
 	chassis.waitUntilDone();
 	pros::delay(500);
 
 	piston.set_value(clamp); // clamp mogo
-	pros::delay(600);
+	pros::delay(400);
 
 	chassis.turnToPoint(-23.343, 23.547, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
 	intake_on = true;
-	chassis.moveToPose(-23.343, 23.547, 80, globalTimeout, {.forwards = intakeside, .lead = -.3, .maxSpeed = 100, .minSpeed = 60}); // score ring
-	chassis.waitUntilDone();
-	pros::delay(500);
+	chassis.moveToPose(-23.343, 23.547, 78, globalTimeout, {.forwards = intakeside, .lead = -.3, .maxSpeed = 100, .minSpeed = 60}); // score ring
+//	chassis.waitUntilDone();
+	//pros::delay(500);
 	
 
-	chassis.moveToPose(-0.035, 38.833, 80, globalTimeout, {.forwards = intakeside, .lead = .38, .maxSpeed = max_v, .minSpeed = min_v}); // set up to score mogo
+	chassis.moveToPose(-0.035, 38.833, 75, globalTimeout, {.forwards = intakeside, .lead = -.05, .maxSpeed = max_v, .minSpeed = min_v}); // set up to score mogo
 	chassis.waitUntil(4);
 	chassis.cancelMotion();
 	chassis.moveToPoint(25.315, 44.274, globalTimeout, {.forwards = intakeside, .maxSpeed = 60, .minSpeed = 10}); //score far ring
@@ -286,25 +286,84 @@ chassis.setPose({-59.823, 0, 90});
 	
 	chassis.moveToPose(-31.112, 61.658, 90, globalTimeout, {.forwards = intakeside, .lead = .3, .maxSpeed = max_v, .minSpeed = min_v}); //set up to put mogo in corner
 
-	chassis.moveToPose(-60.751, 62.658, 90, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 30}); // score mogo in corner
+	chassis.moveToPose( -60.751, 62.658, 90, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 30}); // score mogo in corner
 	chassis.waitUntilDone();
 	pros::delay(400);
 	piston.set_value(unclamp); // unclamp mogo
 	//lift.move_voltage(intakeoff);
 	intake_on = false;
-	chassis.moveToPose(-60.751, 62.658, 90, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 30}); // score mogo in corner
+    Intake2.move_voltage(-12000);
+    chassis.waitUntil(6);
+    Intake2.move_voltage(0);
+     //   Intake2.move_voltage(-12000);
 
-	chassis.moveToPose(57.862, 24.57, 125, 7000,{.forwards = clampside, .maxSpeed = 40, .minSpeed = 0}); // score ring
-	chassis.waitUntilDone();
-	pros::delay(500);
+    
+    
+
+
+
+
+
+
+    //todo 3rd section 
+	chassis.moveToPoint(3.085, 45.658, globalTimeout, {.forwards = intakeside, .maxSpeed = 110, .minSpeed = 70}); // score mogo in corner
+    chassis.waitUntilDone();
+	pros::delay(300);
+//chassis.turnToHeading(0 , 4000);
+
+    chassis.turnToPoint(24.326, 22.619, 1000);
+	chassis.moveToPose(24.326, 22.619, 125,  3000,{.forwards = intakeside, .maxSpeed = 110, .minSpeed = 50}); //ring half
+
+
+    intake_on = false;
+
+  //  pros::delay(500);
+  
+    chassis.turnToPoint(46.519, -0.256 , 2000);
+    chassis.waitUntilDone();
+
+    chassis.moveToPoint(46.519, -0.256, globalTimeout, {.forwards = clampside, .maxSpeed = 60, .minSpeed = 30}); // score mogo in corner
+    chassis.waitUntilDone(); 
+    pros::delay(300);
+    
 
 	piston.set_value(clamp); // clamp mogo
-	pros::delay(600);
-
-	chassis.moveToPose(-60.751, 62.658, 0, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 30}); // score mogo in corner
-	chassis.moveToPose(-60.751, 62.658, 0, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 30}); // score mogo in corner
+	pros::delay(400);
+    intake_on = true;
 
 
+ 
+
+    chassis.turnToPoint(23.498, -23.294, 1500);
+    chassis.waitUntilDone();
+    chassis.moveToPose(23.498, -23.294, 90, globalTimeout, {.forwards = intakeside, .lead = -.1, .maxSpeed = 110, .minSpeed = 90}); 
+    chassis.waitUntilDone();
+    pros::delay(300);
+
+    
+    intake_on = false;
+    pros::delay(200);
+    piston.set_value(unclamp); 
+
+    intake_on = false;
+
+
+    chassis.moveToPose(57.248, 20.07, 0,  3000,{.forwards = intakeside, .maxSpeed = 110, .minSpeed = 50}); 
+
+    chassis.moveToPose(60.751, 62.658, 0, globalTimeout, {.forwards = intakeside, .maxSpeed = 110, .minSpeed = 100}); // score mogo in corner
+	chassis.waitUntilDone();
+    pros::delay(300);
+	piston.set_value(unclamp); 
+
+	chassis.moveToPose(57.248, 20.07, 0,  3000,{.forwards = clampside, .maxSpeed = 110, .minSpeed = 100}); 
+
+    chassis.moveToPose(60.751, 62.658, 0, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 100}); // score mogo in corner
+
+
+ 	// chassis.moveToPose(60.751, -62.658, 180, globalTimeout, {.forwards = clampside, .maxSpeed = 127, .minSpeed = 127}); // score mogo in corner
+    // chassis.waitUntilDone();
+    // pros::delay(500);
+    // intake_on = true;
 }
 
 #endif

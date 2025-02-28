@@ -52,10 +52,15 @@ State prevstate = state;
 inline void jamRing() {
     for (int i = 0; i < 4; ++i) {
         lift.move_voltage(12000);
-        pros::delay(100);
-        lift.move(0);
-        pros::delay(60);
+        pros::delay(110);
+        lift.move(-12000);
+        pros::delay(40);
     }
+    lift.move_voltage(12000);
+    pros::delay(100);
+    lift.move_voltage(-12000);
+    pros::delay(30);
+    lift.move(0);
 }
 
 
