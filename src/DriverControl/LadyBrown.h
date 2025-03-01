@@ -17,6 +17,7 @@ double previous_error = 0.0;
 double integral = 0.0;
 int target_position = 10;
 bool manual_control = false;
+bool notjam = false;
 
 
 // Motor, Encoder, and Controller Instances
@@ -50,7 +51,7 @@ State prevstate = state;
 
 
 inline void jamRing() {
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 2; ++i) {
         lift.move_voltage(12000);
         pros::delay(110);
         lift.move(-12000);
@@ -61,8 +62,18 @@ inline void jamRing() {
     lift.move_voltage(-12000);
     pros::delay(30);
     lift.move(0);
+ 
+    
 }
 
+inline void moveback() {
+        lift.move(-12000);
+        pros::delay(35);
+        lift.move(0);
+
+    
+}
+static int extrapower = 0; 
 
 inline void updateStateFromInput() {
     
@@ -71,28 +82,68 @@ inline void updateStateFromInput() {
 
     if (master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) { 
         state = STATE_MID;
-    } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
+    } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
         prevstate = state;
         state = STATE_UP;
     } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
         state = STATE_DOWN;        
     }  
-    else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)) {
+    else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1 )) {
         state = STATE_MANUAL;
     }
-    // else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
-    //     prevstate = state;
-    //     state = STATE_UPDOWN;
+    else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2 )) {
+        state = STATE_MANUAL;
+    }
+    else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
+        state = STATE_UPDOWN;
+    }
+
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+
+        extrapower = -3000;
+
+
+       
+      } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+        extrapower = 3000;
+        
+      }
+      else {
+
+        extrapower =0;
+        
+      }
+
+      
+    //   if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+    //     if (notjam == true) {
+    //         notjam = false;
+    //     } else {
+    //         notjam = true;
+    //     }
     // }
+    
+
+
+
+
+
+    
+    }
+      
+
     
     
 
-}
+
 
 inline void RedirectControl() {
 
 //while (true) {
     static bool ranjam = false;
+    static bool nomoveback = false;
+
+    
 
     // Fetch encoder position
     double rotation_position = encoder.get_position()/100;
@@ -102,10 +153,13 @@ inline void RedirectControl() {
     if (state != STATE_UP) {
         ranjam = false;
     }
+    if (state != STATE_UPDOWN) {
+        nomoveback = false;
+    }
 
     switch (state) {
         case STATE_UP:
-             if (ranjam == false){
+             if (ranjam == false && !notjam){
                 jamRing();
                 ranjam = true;
              }
@@ -120,24 +174,36 @@ inline void RedirectControl() {
             
             break;
 
-            case STATE_MANUAL:
-                if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
-                        Redriect.move_voltage(-3000);
-                    else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
-                        Redriect.move_voltage(3000);
-                    else
-                        Redriect.move_voltage(0);
-                    previous_error = 0;
-                    integral = 0;
-                     return;
-            // case STATE_UPDOWN:
-            //     state = STATE_UP;
-            //     pros::delay(1000);
-            //     if (state != STATE_UPDOWN)
-            //         state = prevstate;
-            //     else
-            //         state = STATE_DOWN;
-            //     break;
+            case STATE_MANUAL: {
+                if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+                    Redriect.move_voltage(-3000);
+                    target_position = rotation_position;
+                } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+                    Redriect.move_voltage(3000);
+                    target_position = rotation_position;
+                } else {
+                    Redriect.move_voltage(0);
+
+                    //target_position = rotation_position;
+                }
+
+                previous_error = 0;
+                integral = 0;
+
+                break;
+           //     return;
+            }
+            case STATE_UPDOWN:
+            if (nomoveback == false && !nomoveback){
+                moveback();
+                nomoveback = true;
+             }
+            
+           // moveback();
+                target_position = UP;
+                break;
+
+         
 
             // case STATE_HOVER:
             //     jamRing();
@@ -169,7 +235,7 @@ inline void RedirectControl() {
             output = 0;
         }
 
-        Redriect.move_voltage(output);  // Apply the output voltage
+        Redriect.move_voltage(output + extrapower);  // Apply the output voltage
         previous_error = error;
 
 }
