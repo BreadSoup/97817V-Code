@@ -133,14 +133,14 @@ bin/main.cpp.o: src/main.cpp include/main.h include/api.h \
  include/lemlib/chassis/trackingWheel.hpp include/pros/motor_group.hpp \
  include/pros/adi.hpp include/pros/rotation.hpp \
  src/DriverControl/BrainScreen.h src/DriverControl/definitions.h \
- include/lemlib/api.hpp include/lemlib/pid.hpp include/lemlib/pose.hpp \
- include/lemlib/util.hpp include/lemlib/chassis/chassis.hpp \
- include/pros/imu.hpp include/lemlib/exitcondition.hpp \
- include/lemlib/driveCurve.hpp include/lemlib/logger/logger.hpp \
- include/fmt/core.h include/fmt/format.h include/fmt/core.h \
- include/fmt/format-inl.h include/lemlib/logger/baseSink.hpp \
- include/fmt/args.h include/lemlib/logger/message.hpp \
- include/lemlib/logger/infoSink.hpp \
+ include/pros/optical.hpp include/lemlib/api.hpp include/lemlib/pid.hpp \
+ include/lemlib/pose.hpp include/lemlib/util.hpp \
+ include/lemlib/chassis/chassis.hpp include/pros/imu.hpp \
+ include/lemlib/exitcondition.hpp include/lemlib/driveCurve.hpp \
+ include/lemlib/logger/logger.hpp include/fmt/core.h include/fmt/format.h \
+ include/fmt/core.h include/fmt/format-inl.h \
+ include/lemlib/logger/baseSink.hpp include/fmt/args.h \
+ include/lemlib/logger/message.hpp include/lemlib/logger/infoSink.hpp \
  include/lemlib/logger/telemetrySink.hpp src/DriverControl/definitions.h \
  src/DriverControl/pneumatics.h src/DriverControl/roller.h \
  src/DriverControl/redirect.h src/DriverControl/auton.h \
@@ -367,6 +367,7 @@ include/pros/adi.hpp:
 include/pros/rotation.hpp:
 src/DriverControl/BrainScreen.h:
 src/DriverControl/definitions.h:
+include/pros/optical.hpp:
 include/lemlib/api.hpp:
 include/lemlib/pid.hpp:
 include/lemlib/pose.hpp:

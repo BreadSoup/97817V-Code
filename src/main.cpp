@@ -44,6 +44,8 @@ void initialize() {
 	intializePneumatics();
 	lv_init();
 	setup_lcd();
+	pros::Task atask(colorsort, (void*)NULL);
+
 
     // Setup our custom interface.
 
@@ -115,9 +117,10 @@ void autonomous() {
     std::string selectedAutoStr = "Selected auto: " + getAutoName(cycle_number);
     // Update the LVGL auto label with the selected autonomous mode.
     lv_label_set_text(auto_label, selectedAutoStr.c_str());
-  skills();
- // autonbluepos();
-
+  skill2();
+  //autonbluepos();
+  //autoredneg();
+  //autonredpos();
 
 
     // // Run the corresponding autonomous routine.

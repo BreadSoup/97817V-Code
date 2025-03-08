@@ -3,6 +3,7 @@
 
 #include "pros/adi.hpp"
 #include "pros/motor_group.hpp"
+#include "pros/optical.hpp"
 #include "pros/rotation.hpp"
 #include "lemlib/api.hpp"
 
@@ -22,6 +23,8 @@ extern pros::Motor Redriect;
 extern pros::Rotation encoder;
 extern pros::Rotation horztracking;
 extern pros::MotorGroup drivetrain;
+
+extern pros::Optical colorsensor;
 
 
 extern bool pistonState;

@@ -4,6 +4,7 @@ bin/DriverControl/definitions.cpp.o: src/DriverControl/definitions.cpp \
  include/pros/device.hpp include/pros/misc.hpp include/pros/misc.h \
  include/pros/rtos.hpp include/pros/rtos.h include/pros/motors.h \
  include/pros/rtos.hpp include/pros/colors.hpp include/pros/motors.hpp \
+ include/pros/optical.hpp include/pros/optical.h include/pros/error.h \
  include/pros/rotation.hpp include/pros/rotation.h include/lemlib/api.hpp \
  include/lemlib/pid.hpp include/lemlib/pose.hpp include/lemlib/util.hpp \
  include/lemlib/chassis/chassis.hpp include/pros/imu.hpp \
@@ -29,6 +30,9 @@ include/pros/motors.h:
 include/pros/rtos.hpp:
 include/pros/colors.hpp:
 include/pros/motors.hpp:
+include/pros/optical.hpp:
+include/pros/optical.h:
+include/pros/error.h:
 include/pros/rotation.hpp:
 include/pros/rotation.h:
 include/lemlib/api.hpp:

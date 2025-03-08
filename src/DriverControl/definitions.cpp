@@ -2,6 +2,7 @@
 #include "pros/adi.hpp"
 #include "pros/motor_group.hpp"
 #include "pros/motors.hpp"
+#include "pros/optical.hpp"
 #include "pros/rotation.hpp"
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
@@ -12,14 +13,15 @@ pros::MotorGroup right_mg({15, 19, 9});
 //pros::MotorGroup drivetrain({-18, -17, -13, 15, 19, 9});
 //pros::Motor roller(8);
 pros::MotorGroup lift({-21,-1});
-pros::Motor Redriect1(12);
+pros::Motor Redriect1(14);
 pros::Motor Redriect2(-0);
-pros::Motor Intake1(-1);
+pros::Motor Intake1(1);
 pros::Motor Intake2(-21);
-pros::Motor Redriect(12); //idk what port 0 does
+pros::Motor Redriect(14 ); //idk what port 0 does
 pros::Rotation encoder(2);
 pros::Rotation horztracking(6);
 pros::MotorGroup drivetrain({-18,-17,-13,15,19,9});
+pros::Optical colorsensor(20);
 bool pistonState = false;
 bool doinkerstate = false;
 bool reversedSteering = false;
@@ -48,7 +50,7 @@ lemlib::Drivetrain yah(&leftm, // left motor group
                               12.5,
                               lemlib::Omniwheel::NEW_325, 
                               450, 
-                              2 // horizontal drift is 2. If we had traction wheels, it would have been 8
+                              8 // horizontal drift is 2. If we had traction wheels, it would have been 8
 );
 lemlib::ControllerSettings linearController(10.25, // proportional gain (kP)
                                             0, // integral gain (kI)
@@ -58,13 +60,13 @@ lemlib::ControllerSettings linearController(10.25, // proportional gain (kP)
                                             100, // small error range timeout, in milliseconds
                                             3, // large error range, in inches
                                             500, // large error range timeout, in milliseconds
-                                            20 // maximum acceleration (slew)              // was 20 
+                                            40 // maximum acceleration (slew)              // was 20 
 );
 
 // angular motion controller
 lemlib::ControllerSettings angularController(1.85, // proportional gain (kP)
                                              0, // integral gain (kI)
-                                             14.5, // derivative gain (kD // was 10)
+                                             18.5, // derivative gain (kD // was 10)
                                              3, // anti windup
                                              1, // small error range, in degrees
                                              100, // small error range timeout, in milliseconds
