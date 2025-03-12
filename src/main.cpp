@@ -44,7 +44,8 @@ void initialize() {
 	intializePneumatics();
 	lv_init();
 	setup_lcd();
-	pros::Task atask(colorsort, (void*)NULL);
+	pros::Task intakeTask(intakeStateMachine, NULL, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Intake State Machine");
+	colorsensor.set_led_pwm(232);  // Set brightness to 100%
 
 
     // Setup our custom interface.
@@ -55,7 +56,7 @@ void initialize() {
 	//pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate();     // calibrate sensors
 	
- 
+	
 
 
     pros::lcd::clear();
@@ -116,15 +117,17 @@ void competition_initialize() {}
 void autonomous() {
     std::string selectedAutoStr = "Selected auto: " + getAutoName(cycle_number);
     // Update the LVGL auto label with the selected autonomous mode.
+
     lv_label_set_text(auto_label, selectedAutoStr.c_str());
-  skill2();
+  stateskills();
   //autonbluepos();
   //autoredneg();
   //autonredpos();
 
 
     // // Run the corresponding autonomous routine.
-    // switch (cycle_number) {
+    // switch (cycle_number) {									// Switch statement to run the selected autonomous routine
+
     //     case 0:
     //         autonsupersafe();
     //         break;
@@ -169,7 +172,7 @@ void autonomous() {
 void opcontrol() {
 	bool pistonState;
  	bool reversedSteering;
-	intakerevdone = true;
+//	intakerevdone = true;
     
  
 	lv_task_handler();
@@ -204,7 +207,7 @@ void opcontrol() {
 		}
 		*/
 		clampSolenoid();
-		rollerControl();
+	//	rollerControl();
 		updateStateFromInput();
 		RedirectControl();
 	//	RedirectControl();
@@ -216,7 +219,7 @@ void opcontrol() {
 		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
 			Redriect.move(0);
 		}
- 
+
 		pros::delay(20);                               // Run for 20 ms then update
 	}
 }

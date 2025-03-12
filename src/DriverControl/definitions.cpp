@@ -13,15 +13,15 @@ pros::MotorGroup right_mg({15, 19, 9});
 //pros::MotorGroup drivetrain({-18, -17, -13, 15, 19, 9});
 //pros::Motor roller(8);
 pros::MotorGroup lift({-21,-1});
-pros::Motor Redriect1(14);
-pros::Motor Redriect2(-0);
+// pros::Motor Redriect1(14);
+// pros::Motor Redriect2(-0);
 pros::Motor Intake1(1);
 pros::Motor Intake2(-21);
 pros::Motor Redriect(14 ); //idk what port 0 does
 pros::Rotation encoder(2);
 pros::Rotation horztracking(6);
 pros::MotorGroup drivetrain({-18,-17,-13,15,19,9});
-pros::Optical colorsensor(20);
+pros::Optical colorsensor(11);
 bool pistonState = false;
 bool doinkerstate = false;
 bool reversedSteering = false;

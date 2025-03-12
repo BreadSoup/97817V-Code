@@ -4,124 +4,127 @@
 #include "definitions.h"
 #include "pros/rtos.h"
 #include "pros/rtos.hpp"
-bool intake_on = false;   
-bool intakerevdone = false;
-bool revtop = false;
-bool stopbottom = false;
+#include "roller.h"
+// bool intake_on = false;   
+// bool intakerevdone = false;
+// bool revtop = false;
+// bool stopbottom = false;
  
-inline void intakereverse(void* param) {
+// inline void intakereverse(void* param) {
 
-   static int state = 1;
-   static int stateStartTime = 0;
+//    static int state = 1;
+//    static int stateStartTime = 0;
 
-   const int normalVoltage = 12000;
-   const int reverseVoltage = -12000;
-   const int velocityThreshold = 10;
+//    const int normalVoltage = 12000;
+//    const int reverseVoltage = -12000;
+//    const int velocityThreshold = 10;
 
-   while (true) {
-       int currentTime = pros::millis();
+//    while (true) {
+//        int currentTime = pros::millis();
 
-		if (!intake_on && !stopbottom) {
-           Intake2.move_voltage(0);
-           Intake1.move_voltage(12000); }
-		else if  (!intake_on && stopbottom) {
-		   Intake1.move_voltage(0);
-		   Intake2.move_voltage(0);
-		  } 
+// 		if (!intake_on && !stopbottom) {
+//            Intake2.move_voltage(0);
+//            Intake1.move_voltage(12000); }
+// 		else if  (!intake_on && stopbottom) {
+// 		   Intake1.move_voltage(0);
+// 		   Intake2.move_voltage(0);
+// 		  } 
 
-		else if (!intake_on && revtop) {
+// 		else if (!intake_on && revtop) {
 
-			Intake1.move_voltage(0);
-			Intake2.move_voltage(-12000);
-		}
-		else {
-           switch (state) {
-               case 1: 
-                   Intake1.move_voltage(normalVoltage);
-				   Intake2.move_voltage(normalVoltage);
+// 			Intake1.move_voltage(0);
+// 			Intake2.move_voltage(-12000);
+// 		}
+// 		else {
+//            switch (state) {
+//                case 1: 
+//                    Intake1.move_voltage(normalVoltage);
+// 				   Intake2.move_voltage(normalVoltage);
 
-                   if (lift.get_actual_velocity() < velocityThreshold) {
-                       if (stateStartTime == 0) {
-                           stateStartTime = currentTime;
-                       }
-                       if (stateStartTime != 0 && (currentTime - stateStartTime >= 1000)) {
-                           state = 2;
-                           stateStartTime = currentTime;
-                       }
-                   }
-                   if (lift.get_actual_velocity() >= velocityThreshold) {
-                       stateStartTime = 0;
-                   }
-                   break;
+//                    if (lift.get_actual_velocity() < velocityThreshold) {
+//                        if (stateStartTime == 0) {
+//                            stateStartTime = currentTime;
+//                        }
+//                        if (stateStartTime != 0 && (currentTime - stateStartTime >= 1000)) {
+//                            state = 2;
+//                            stateStartTime = currentTime;
+//                        }
+//                    }
+//                    if (lift.get_actual_velocity() >= velocityThreshold) {
+//                        stateStartTime = 0;
+//                    }
+//                    break;
 
-               case 2:
-                   Intake2.move_voltage(reverseVoltage);
-                   if (currentTime - stateStartTime >= 1600) {
-                       state = 1;
-                       stateStartTime = currentTime;
-                   }
-                   break;
+//                case 2:
+//                    Intake2.move_voltage(reverseVoltage);
+//                    if (currentTime - stateStartTime >= 1600) {
+//                        state = 1;
+//                        stateStartTime = currentTime;
+//                    }
+//                    break;
 
-               case 3:  
-                   lift.move_voltage(normalVoltage);
-                   if (lift.get_actual_velocity() < velocityThreshold) {
-                       state = 2; 
-                       stateStartTime = currentTime;
-                   }
-                   if (lift.get_actual_velocity() >= velocityThreshold) {
-                       state = 1;  
-                       stateStartTime = 0;
-                   }
-                   break;
+//                case 3:  
+//                    lift.move_voltage(normalVoltage);
+//                    if (lift.get_actual_velocity() < velocityThreshold) {
+//                        state = 2; 
+//                        stateStartTime = currentTime;
+//                    }
+//                    if (lift.get_actual_velocity() >= velocityThreshold) {
+//                        state = 1;  
+//                        stateStartTime = 0;
+//                    }
+//                    break;
 
-               default:
-                   state = 1;
-                   stateStartTime = 0;
-                   break;
-           }
+//                default:
+//                    state = 1;
+//                    stateStartTime = 0;
+//                    break;
+//            }
 
-           if (intakerevdone) {
-               break ;
-       }
-       pros::delay(40);  
-   }
-}
-}
-
-
-
-inline void colorsort(void* param){
-	double hue = colorsensor.get_hue();
-		int colorval = 0;
-
-		bool kickred = true;
-		bool kickblue = false;
-		while (true){
-			double hue = colorsensor.get_hue();
-
-
-		if (((hue >= 1 && hue < 30) || (hue > 330 && hue <= 360)) && kickred) {
-			colorval = 1;  // Red detected.
-			pros::delay(300);
-
-			Intake2.move_voltage(-12000);
-			pros::delay(100);
+//            if (intakerevdone) {
+//                break ;
+//        }
+//        pros::delay(40);  
+//    }
+// }
+// }
 
 
 
-		} else if (hue >= 150 && hue <= 260 && kickblue) {
-			colorval = 0;  // Blue detected.
-		} else {
-			colorval = -1; // No clear detection.
-		}
+// inline void colorsort(void* param){
+// 	double hue = colorsensor.get_hue();
+// 		int colorval = 0;
+
+// 		bool kickred = true;
+// 		bool kickblue = false;
+// 		while (true){
+// 			double hue = colorsensor.get_hue();
+
+
+// 		if (((hue >= 1 && hue < 30) || (hue > 330 && hue <= 360)) && kickred) {
+// 			printf("Red detected\n");
+
+// 			colorval = 1;  // Red detected.
+// 			pros::delay(300);
+
+// 			Intake2.move_voltage(12000);
+// 			pros::delay(4000);
+
+
+
+// 		} else if (hue >= 150 && hue <= 260 && kickblue) {
+// 			colorval = 0;  // Blue detected.
+// 		} else {
+// 			colorval = -1; // No clear detection.
+// 		}
 		
-		// Debug output (optional)
-		printf("Hue: %lf, ColorSort: %d\n", hue, colorval);
+// 		// Debug output (optional)
+// 		printf("Hue: %lf, ColorSort: %d\n", hue, colorval);
 		
-		pros::delay(20);  // Delay to allow other tasks to run.
-	}
+// 		pros::delay(20);  // Delay to allow other tasks to run.
+// 	}
 
-}
+// }
 
 /*
 1 = autonsupersafe
@@ -161,7 +164,7 @@ inline void autonsupersafe(){
 
 inline void skills(){
     
- 	pros::Task task(intakereverse, (void*)NULL);
+ 	pros::Task task(intakeStateMachine, (void*)NULL);
 	bool intakeside = true;
 	bool clampside = false; 
 	
@@ -435,7 +438,7 @@ chassis.setPose({-59.823, 0, 90});
 
 inline void stateskills(){
 	    
-	pros::Task task(intakereverse, (void*)NULL);
+	pros::Task task(intakeStateMachine, (void*)NULL);
 	bool intakeside = true;
 	bool clampside = false; 
 	
@@ -527,10 +530,10 @@ revtop = true;
 	//chassis.moveToPoint(0, -36.5, globalTimeout,{.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v} ); //drive backwards
 
 //	chassis.getPose();
-	chassis.moveToPose(0, -39.5, 140, globalTimeout, {.forwards = clampside, .lead =-.1,.maxSpeed = max_v, .minSpeed = min_v}); //drive backwards
+	chassis.moveToPose(-7, -43.5, 140, globalTimeout, {.forwards = clampside, .lead =-.1,.maxSpeed = max_v, .minSpeed = min_v}); //drive backwards
 	// face wall stake with intake side
-	chassis.turnToPoint(0, -153.292, globalTimeout, {.forwards = intakeside, .maxSpeed = 60, .minSpeed = maxang_v});// grab score ring on mogo
-
+	//chassis.turnToPoint(0, -153.292, globalTimeout, {.forwards = intakeside, .maxSpeed = 60, .minSpeed = maxang_v});// grab score ring on mogo
+	
 	// score held ring on stake
 	chassis.moveToPose(-0.00, -60.975, 180, globalTimeout, {.forwards = intakeside, .maxSpeed = 90, .minSpeed = 10}); // score ring
 	///////////////
@@ -602,7 +605,7 @@ revtop = true;
 	// score ring 
 	chassis.turnToPoint(-23.343, 23.547, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
 	intake_on = true;
-	chassis.moveToPose(-23.343, 23.547, 78, globalTimeout, {.forwards = intakeside, .lead = -.3, .maxSpeed = 100, .minSpeed = 60}); // score ring
+	chassis.moveToPose(-23.343, 23.547, 78, globalTimeout, {.forwards = intakeside, .lead = -.3, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
 
 	// face next ring  MAKE FAST
 	chassis.turnToPoint(-24.979, 47.888, globalTimeout, {.forwards = intakeside});
@@ -615,12 +618,12 @@ revtop = true;
 	chassis.moveToPose(-59.342, 46.661, 270, globalTimeout, {.forwards = intakeside, .maxSpeed = 125}); 
 
 	// get side ring
-	chassis.moveToPose(-43.208, 61.918, 225, 1200, {.forwards = intakeside, .lead = -.3, .maxSpeed = 90, .minSpeed = 10}); // score ring
+	chassis.moveToPose(-43.208, 61.918, 225, 1200, {.forwards = intakeside, .lead = -.3, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
 
 
 
 	chassis.moveToPose(-20.112,59.658, 100, globalTimeout, {.forwards = intakeside, .maxSpeed = 127, .minSpeed = 100});
-	chassis.moveToPose(-66.751, 59.658, 100, globalTimeout, {.forwards = clampside, .maxSpeed = 70, .minSpeed = 30}); // score mogo in corner
+	chassis.moveToPose(-66.751, 59.658, 100, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // score mogo in corner
 	chassis.waitUntilDone();
 	pros::delay(400);
 	piston.set_value(unclamp); // unclamp mogo
@@ -629,6 +632,92 @@ revtop = true;
 
 
 	//todo PART 2.5 get wall stakes
+
+	//get far ring 
+
+	chassis.moveToPose(-1.252, 41.293, 60, globalTimeout, {.forwards = intakeside, .lead = .3, .maxSpeed = max_v, .minSpeed = min_v, .earlyExitRange = 12 }); // avoid ladder
+	intake_on = true;
+	//grab far ring
+	chassis.moveToPoint(25.315, 44.274, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // grab ring
+
+	chassis.moveToPoint(0, 43.5, globalTimeout, {.forwards = clampside,.maxSpeed = max_v, .minSpeed = min_v}); //drive backwards
+	// score held ring on stake
+
+	chassis.turnToPoint(0, 153.292, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v});
+	chassis.moveToPose(0.00, 60.975, 0, globalTimeout, {.forwards = intakeside, .maxSpeed = 90, .minSpeed = 10}); // score ring
+	///////////////
+	//LB SCORED////
+	//////////////
+	//todo part 3
+
+	//grab mogo
+	chassis.moveToPoint(0.00, 50.975, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
+
+	chassis.moveToPose(59.702, 22.729, 120, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 70}); // grab mogo
+	chassis.waitUntilDone();
+	pros::delay(400);
+	piston.set_value(clamp); // clamp mogo
+	pros::delay(400);
+	intake_on = true;
+
+	// score in corner
+
+	chassis.turnToPoint(66.751, 59.658, globalTimeout, {.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // sface corner
+
+	chassis.moveToPose(66.751, 59.658, 190, globalTimeout, {.forwards = clampside, .lead =.4, .maxSpeed = max_v, .minSpeed = min_v}); // score mogo in corner
+	chassis.waitUntilDone();
+	pros::delay(400);
+	piston.set_value(unclamp); // unclamp mogo
+	intake_on = false;
+
+
+	//todo part 4
+
+	
+	chassis.moveToPoint(50.975, 0, globalTimeout, {.forwards = clampside, .maxSpeed = 90, .minSpeed = 10}); // grab mogo
+	chassis.waitUntilDone();
+	pros::delay(400);
+	piston.set_value(clamp); // clamp mogo
+	pros::delay(400);
+	intake_on = true;
+
+
+
+	chassis.turnToPoint(23.294, 24.161, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
+	intake_on = true;
+	chassis.moveToPoint(23.294, 24.161, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
+
+	chassis.turnToPoint(0, 0, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
+	chassis.moveToPose(0, 0, 230, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // grab mid ring
+
+
+	chassis.turnToPoint(23.294, -24.161, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
+	chassis.moveToPoint(24.294, -25.161, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
+	chassis.moveToPoint(47, -47, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
+
+
+	chassis.turnToPoint(66.751, -59.658, globalTimeout, {.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v}); 
+	chassis.moveToPoint(66.751, -59.658, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // score mogo in corner
+	chassis.waitUntilDone();
+	pros::delay(400);
+	piston.set_value(unclamp); // unclamp mogo
+	intake_on = false;
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+		 
 
 
 
@@ -647,7 +736,7 @@ revtop = true;
 inline void autoredneg(){
 	intake_on = false;
 
-	pros::Task task(intakereverse, (void*)NULL);
+	pros::Task task(intakeStateMachine, (void*)NULL);
 
 	bool intakeside = true;
 	bool clampside = false; 
@@ -705,7 +794,7 @@ inline void autoredneg(){
 inline void autonbluepos(){
 	intake_on = false;
 
-	pros::Task task(intakereverse, (void*)NULL);
+	pros::Task task(intakeStateMachine, (void*)NULL);
 
 	bool intakeside = true;
 	bool clampside = false; 
@@ -822,7 +911,7 @@ inline void autonbluepos(){
 
 }
 inline void autonredpos(){
-	pros::Task task(intakereverse, (void*)NULL);
+	pros::Task task(intakeStateMachine, (void*)NULL);
 	bool intakeside = true;
 	bool clampside = false; 
 	
