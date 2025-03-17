@@ -27,9 +27,9 @@ bool notJam = false;
 
 // Macro states
 int UP = 140;
-int HOVER = 90;
-int MID = 50;
-int DOWN = 10;
+int HOVER = 65;
+int MID = 45;
+int DOWN = 5;
 
 int deadZoneLower = 5;
 int deadZoneUpper = 15;
@@ -45,8 +45,6 @@ enum State {
 
 State state = STATE_DOWN; // Added state variable
 State prevState = state;
-
-
 
 
 inline void jamRing() {
@@ -115,6 +113,7 @@ inline void RedirectControl() {
 
     pros::lcd::set_text(5, "Rotation: " + std::to_string(rotationPosition));
     pros::lcd::set_text(6, "Target: " + std::to_string(targetPosition));
+    printf("State %d\n", state);
     if (state != STATE_UP) {
         ranjam = false;
     }
@@ -141,13 +140,15 @@ inline void RedirectControl() {
 
             case STATE_MANUAL: {
                 if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-                    Redriect.move_voltage(-3000);
-                    targetPosition = rotationPosition;
+                    Redriect.move_voltage(-30000);
+                    return;
                 } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-                    Redriect.move_voltage(3000);
-                    targetPosition = rotationPosition;
+                    Redriect.move_voltage(30000);
+                    return;
                 } else {
                     Redriect.move_voltage(0);
+                    targetPosition = encoder.get_position()/100.0;
+
 
                     //targetPosition = rotationPosition;
                 }
@@ -156,7 +157,6 @@ inline void RedirectControl() {
                 integral = 0;
 
                 break;
-           //     return;
             }
             case STATE_UPDOWN:
             if (noMoveBack == false && !noMoveBack){
@@ -190,12 +190,12 @@ inline void RedirectControl() {
         double derivative = error - previousError;
         double output = (kP * error) + (kI * integral) + (kD * derivative);
 
-        if (state == STATE_DOWN && (rotationPosition >= deadZoneLower && rotationPosition <= deadZoneUpper)) { 
-            output = 0;
-        }
+        // if (state == STATE_DOWN && (rotationPosition >= deadZoneLower && rotationPosition <= deadZoneUpper)) { 
+        //     output = 0;
+        // }
 
-        Redriect.move_voltage(output);  // Apply the output voltage
-        previousError = error;
+       Redriect.move_voltage(output + extrapower);  // Apply the output voltage
+ previousError = error;
 
 }
 //}

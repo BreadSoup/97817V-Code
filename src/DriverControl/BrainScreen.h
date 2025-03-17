@@ -1,3 +1,4 @@
+#pragma once
 #include "main.h"
 #include "pros/rtos.h"
 #include "definitions.h"

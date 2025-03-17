@@ -119,6 +119,7 @@ void autonomous() {
     // Update the LVGL auto label with the selected autonomous mode.
 
     lv_label_set_text(auto_label, selectedAutoStr.c_str());
+
   stateskills();
   //autonbluepos();
   //autoredneg();
@@ -172,6 +173,7 @@ void autonomous() {
 void opcontrol() {
 	bool pistonState;
  	bool reversedSteering;
+	autointake = false;
 //	intakerevdone = true;
     
  
@@ -216,9 +218,9 @@ void opcontrol() {
 		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_Y)){
 			lift.move(0);
 		}
-		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-			Redriect.move(0);
-		}
+		// if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+		// 	Redriect.move(0);
+		// }
 
 		pros::delay(20);                               // Run for 20 ms then update
 	}

@@ -2,6 +2,7 @@
 #define AUTON_H
 
 #include "definitions.h"
+#include "lemlib/chassis/chassis.hpp"
 #include "pros/rtos.h"
 #include "pros/rtos.hpp"
 #include "roller.h"
@@ -163,6 +164,7 @@ inline void autonsupersafe(){
 }
 
 inline void skills(){
+
     
  	pros::Task task(intakeStateMachine, (void*)NULL);
 	bool intakeside = true;
@@ -438,7 +440,7 @@ chassis.setPose({-59.823, 0, 90});
 
 inline void stateskills(){
 	    
-	pros::Task task(intakeStateMachine, (void*)NULL);
+	autointake = true;
 	bool intakeside = true;
 	bool clampside = false; 
 	
@@ -452,8 +454,8 @@ inline void stateskills(){
 	float min_v = 30;
 
 
-	float max_vgoal =40;
-	float min_vgoal = 20;
+	float max_vgoal =60;
+	float min_vgoal = 30;
 
 	float max_vsafe = 60;
 	float min_vsafe = 30;
@@ -467,6 +469,7 @@ inline void stateskills(){
 	int minang_v = 1;
 
 	int globalTimeout = 2200;
+	int globalTimeoutShort = 1300;
 
 
 	// start position
@@ -520,22 +523,29 @@ revtop = true;
 	revtop = false;
 
 	chassis.moveToPoint(-23.956, -23.498, globalTimeout, {.forwards = intakeside, .maxSpeed = 100, .minSpeed = 60, .earlyExitRange = 1.5});
+	chassis.moveToPoint(-23.956, -23.498, globalTimeout, {.forwards = intakeside, .maxSpeed = 100, .minSpeed = 60, .earlyExitRange = 1.5});
+	chassis.moveToPoint(-27.956, -23.498, globalTimeout, {.forwards = clampside, .maxSpeed = 100, .minSpeed = 90, .earlyExitRange = 1.5});
+	chassis.waitUntil(2);
+	chassis.cancelMotion();
 
-	chassis.moveToPose(-1.252, -41.293, 120, globalTimeout, {.forwards = intakeside, .lead = .5, .maxSpeed = max_v, .minSpeed = min_v, .earlyExitRange = 12 }); // avoid ladder
+	// chassis.turnToHeading(180, 1000);
+	chassis.moveToPose(-1.252, -41.293, 130, 1300, {.forwards = intakeside, .lead = .5, .maxSpeed = max_v, .minSpeed = 10, .earlyExitRange = 16 }); // avoid ladder
+
 
 	//grab far ring
+	chassis.turnToPoint(25.315, -44.274, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = maxang_v});// grab score ring on mogo
 	chassis.moveToPoint(25.315, -44.274, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // grab ring
 
 	// reverse to mid
 	//chassis.moveToPoint(0, -36.5, globalTimeout,{.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v} ); //drive backwards
 
 //	chassis.getPose();
-	chassis.moveToPose(-7, -43.5, 140, globalTimeout, {.forwards = clampside, .lead =-.1,.maxSpeed = max_v, .minSpeed = min_v}); //drive backwards
+	chassis.moveToPose(-7, -43.5, 140, globalTimeout, {.forwards = clampside, .lead =-.01,.maxSpeed = max_v, .minSpeed = min_v}); //drive backwards
 	// face wall stake with intake side
 	//chassis.turnToPoint(0, -153.292, globalTimeout, {.forwards = intakeside, .maxSpeed = 60, .minSpeed = maxang_v});// grab score ring on mogo
 	
 	// score held ring on stake
-	chassis.moveToPose(-0.00, -60.975, 180, globalTimeout, {.forwards = intakeside, .maxSpeed = 90, .minSpeed = 10}); // score ring
+	chassis.moveToPose(2.00, -60.975, 180, globalTimeout, {.forwards = intakeside, .lead = .4, .maxSpeed = 90, .minSpeed = 10}); // score ring
 	///////////////
 	//LB SCORED////
 	//////////////
@@ -558,7 +568,7 @@ revtop = true;
 	pros::delay(900);	
 
 	// continue to score 3 rings
-	chassis.moveToPose(-58.915,  -47.08, 270, 2500, {.maxSpeed = 75});
+	chassis.moveToPose(-54.915,  -47.08, 270, 2500, {.maxSpeed = 55});
 
 	// // reverse to ensure and go back towards 
 	// chassis.moveToPoint(-48.915, -47.08, 1500, {.forwards = false , .maxSpeed = 127}); // score 3 rings change from mt 
@@ -570,14 +580,20 @@ revtop = true;
 
 	// score mogo in corner
 	chassis.moveToPose(-20.112, -59.658, 90, globalTimeout, {.forwards = intakeside, .maxSpeed = 127, .minSpeed = 100});
-	chassis.moveToPose(-56.751, -59.658, 90, globalTimeout, {.forwards = clampside, .maxSpeed = 70, .minSpeed = 30}); // score mogo in corner
 	chassis.waitUntilDone();
 	pros::delay(400);
 	piston.set_value(unclamp); // unclamp mogo
+	intake_on = false;
+
+	chassis.moveToPose(-59.751, -59.658, 90, globalTimeout, {.forwards = clampside, .maxSpeed = 70, .minSpeed = 30}); // score mogo in corner
+	// chassis.waitUntilDone();
+	// pros::delay(400);
+	// piston.set_value(unclamp); // unclamp mogo
+	// intake_on = false;
+
 	revtop = true;
 
 	//lift.move_voltage(intakeoff);
-	intake_on = false;
 
 
 
@@ -587,43 +603,45 @@ revtop = true;
 	//todo PART 2
 
 	// reverse out of corner
-	chassis.moveToPoint(-47.474, -58.658, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); 
+	chassis.moveToPoint(-46.474, -58.658, 1000, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); 
 
 	// turn to face mogo
-	chassis.turnToPoint(-47.479, 24.57, globalTimeout, {.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v}); 	
+	chassis.turnToPoint(-46.479, 24.57, 1100, {.forwards = clampside,.direction = AngularDirection::CCW_COUNTERCLOCKWISE, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face mogo	
+
+	chassis.moveToPose(-46.5, 10, 180, globalTimeoutShort, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v, .earlyExitRange = 14}); // drive forwards
+	// stop before mogo 
+	// todo check if need vgoal
+	chassis.moveToPose(-46.5, 32.57, 180, globalTimeoutShort, {.forwards = clampside, .maxSpeed = max_vgoal, .minSpeed = min_vgoal});
+	chassis.waitUntilDone();
+	pros::delay(1000);
+	piston.set_value(clamp); // unclamp mogo
+	pros::delay(1000);
+
+	intake_on = false;
 	revtop = false;
 
-
-	// clamp mogo 
-	// todo check if need vgoal
-	chassis.moveToPose(-47.479, 24.57, 180, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v});
-	chassis.waitUntilDone();
-	pros::delay(600);
-	piston.set_value(clamp); // unclamp mogo
-	intake_on = false;
-
 	// score ring 
-	chassis.turnToPoint(-23.343, 23.547, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
+	chassis.turnToPoint(-23.343, 23.547, globalTimeoutShort, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
 	intake_on = true;
-	chassis.moveToPose(-23.343, 23.547, 78, globalTimeout, {.forwards = intakeside, .lead = -.3, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
+	chassis.moveToPose(-23.343, 23.547, 78, globalTimeoutShort, {.forwards = intakeside, .lead = -.3, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
 
 	// face next ring  MAKE FAST
-	chassis.turnToPoint(-24.979, 47.888, globalTimeout, {.forwards = intakeside});
-	chassis.moveToPoint(-24.979, 47.888,  globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // set up to score mogo
+	chassis.turnToPoint(-24.979, 47.888, globalTimeoutShort, {.forwards = intakeside});
+	chassis.moveToPoint(-24.979, 47.888,  1200, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); 
 
 	// turn towards the 2 rings
-	chassis.turnToPoint(-59.342, 46.661, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); 
+	chassis.turnToPoint(-59.342, 46.661, 1200, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); 
 
 	// score 2 rings
-	chassis.moveToPose(-59.342, 46.661, 270, globalTimeout, {.forwards = intakeside, .maxSpeed = 125}); 
+	chassis.moveToPose(-59.342, 46.661, 270, globalTimeoutShort, {.forwards = intakeside, .maxSpeed = 125}); 
 
 	// get side ring
 	chassis.moveToPose(-43.208, 61.918, 225, 1200, {.forwards = intakeside, .lead = -.3, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
 
 
 
-	chassis.moveToPose(-20.112,59.658, 100, globalTimeout, {.forwards = intakeside, .maxSpeed = 127, .minSpeed = 100});
-	chassis.moveToPose(-66.751, 59.658, 100, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // score mogo in corner
+	chassis.moveToPose(-20.112,59.658, 100, globalTimeoutShort, {.forwards = intakeside, .maxSpeed = 127, .minSpeed = 100});
+	chassis.moveToPose(-72.751, 59.658, 100, 2200, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // score mogo in corner
 	chassis.waitUntilDone();
 	pros::delay(400);
 	piston.set_value(unclamp); // unclamp mogo
@@ -635,36 +653,40 @@ revtop = true;
 
 	//get far ring 
 
-	chassis.moveToPose(-1.252, 41.293, 60, globalTimeout, {.forwards = intakeside, .lead = .3, .maxSpeed = max_v, .minSpeed = min_v, .earlyExitRange = 12 }); // avoid ladder
-	intake_on = true;
+	// chassis.moveToPose(-1.252, 43.293, 90, globalTimeout, {.forwards = intakeside, .lead = .1, .maxSpeed = max_v, .minSpeed = min_v, .earlyExitRange = 24 }); // avoid ladder
+	// intake_on = true;
 	//grab far ring
-	chassis.moveToPoint(25.315, 44.274, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // grab ring
+	chassis.moveToPose(25.315, 53.274, 90, 4000, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // grab ring
 
-	chassis.moveToPoint(0, 43.5, globalTimeout, {.forwards = clampside,.maxSpeed = max_v, .minSpeed = min_v}); //drive backwards
+	chassis.moveToPoint(0, 43.5, 2000, {.forwards = clampside,.maxSpeed = max_v, .minSpeed = min_v}); //drive backwards
 	// score held ring on stake
+	chassis.waitUntilDone();
+	chassis.turnToHeading(0, 1000);
+	// chassis.turnToPoint(0, 153.292, 4000, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v});
+	chassis.waitUntilDone();
+	chassis.moveToPose(-5.00, 65.975, 0, 4000, {.forwards = intakeside, .maxSpeed = 90, .minSpeed = 10}); // score ring
+	chassis.waitUntilDone();
 
-	chassis.turnToPoint(0, 153.292, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v});
-	chassis.moveToPose(0.00, 60.975, 0, globalTimeout, {.forwards = intakeside, .maxSpeed = 90, .minSpeed = 10}); // score ring
 	///////////////
 	//LB SCORED////
 	//////////////
 	//todo part 3
 
 	//grab mogo
-	chassis.moveToPoint(0.00, 50.975, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
+	chassis.moveToPoint(-5.00, 50.975, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
 
-	chassis.moveToPose(59.702, 22.729, 120, globalTimeout, {.forwards = clampside, .maxSpeed = 110, .minSpeed = 70}); // grab mogo
+	chassis.moveToPose(57.702, 24.729, 120, globalTimeout, {.forwards = clampside, .maxSpeed = max_vgoal, .minSpeed = min_vgoal}); // grab mogo
 	chassis.waitUntilDone();
-	pros::delay(400);
+	pros::delay(800);
 	piston.set_value(clamp); // clamp mogo
-	pros::delay(400);
+	pros::delay(500);
 	intake_on = true;
 
 	// score in corner
 
-	chassis.turnToPoint(66.751, 59.658, globalTimeout, {.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // sface corner
+	chassis.turnToPoint(53.751, 59.658, globalTimeout, {.forwards = clampside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // sface corner
 
-	chassis.moveToPose(66.751, 59.658, 190, globalTimeout, {.forwards = clampside, .lead =.4, .maxSpeed = max_v, .minSpeed = min_v}); // score mogo in corner
+	chassis.moveToPoint(53.751, 59.658, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // score mogo in corner
 	chassis.waitUntilDone();
 	pros::delay(400);
 	piston.set_value(unclamp); // unclamp mogo
@@ -674,7 +696,7 @@ revtop = true;
 	//todo part 4
 
 	
-	chassis.moveToPoint(50.975, 0, globalTimeout, {.forwards = clampside, .maxSpeed = 90, .minSpeed = 10}); // grab mogo
+	chassis.moveToPoint(40.975, 0, globalTimeout, {.forwards = clampside, .maxSpeed = 90, .minSpeed = 10}); // grab mogo
 	chassis.waitUntilDone();
 	pros::delay(400);
 	piston.set_value(clamp); // clamp mogo
@@ -687,12 +709,12 @@ revtop = true;
 	intake_on = true;
 	chassis.moveToPoint(23.294, 24.161, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
 
-	chassis.turnToPoint(0, 0, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
-	chassis.moveToPose(0, 0, 230, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // grab mid ring
+	chassis.turnToPoint(-4, -4, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
+	chassis.moveToPose(-4, -4, 230, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // grab mid ring
 
 
-	chassis.turnToPoint(23.294, -24.161, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
-	chassis.moveToPoint(24.294, -25.161, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
+	chassis.turnToPoint(24.294, -25.161, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face ring
+	chassis.moveToPoint(25.294, -26.161, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
 	chassis.moveToPoint(47, -47, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // score ring
 
 
@@ -705,7 +727,7 @@ revtop = true;
 
 
 
-	
+	// todo change quarter ring point
 
 
 

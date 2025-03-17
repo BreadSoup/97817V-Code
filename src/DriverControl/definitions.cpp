@@ -17,8 +17,8 @@ pros::MotorGroup lift({-21,-1});
 // pros::Motor Redriect2(-0);
 pros::Motor Intake1(1);
 pros::Motor Intake2(-21);
-pros::Motor Redriect(14 ); //idk what port 0 does
-pros::Rotation encoder(2);
+pros::Motor Redriect(5 ); //idk what port 0 does
+pros::Rotation encoder(-2);
 pros::Rotation horztracking(6);
 pros::MotorGroup drivetrain({-18,-17,-13,15,19,9});
 pros::Optical colorsensor(11);
@@ -42,7 +42,7 @@ bool reversedSteering = false;
 pros::Imu imu(8); 
 pros::MotorGroup leftm({-18, -17, -13});
 pros::MotorGroup rightm({15, 19, 9});
-lemlib::TrackingWheel horztrackingwheel(&horztracking, lemlib::Omniwheel::NEW_275, -1.5);
+lemlib::TrackingWheel horztrackingwheel(&horztracking, lemlib::Omniwheel::NEW_275,-1);
 // ---------------------- LemLib Setup ----------------------
 
 lemlib::Drivetrain yah(&leftm, // left motor group
