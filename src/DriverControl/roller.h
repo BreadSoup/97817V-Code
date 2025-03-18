@@ -6,6 +6,7 @@
 #include "pros/rtos.h"
 #include "definitions.h"
 #include "pros/rtos.h"
+#include "LadyBrown.h"
 
 enum IntakeState {
     IDLE,
@@ -18,7 +19,9 @@ enum AutoState {
     IntakeNormal,
     IntakeUnstuck,
     AUTO_SORTING_RED,
-    AUTO_SORTING_BLUE
+    AUTO_SORTING_BLUE,
+
+    LB_AUTO
 
 };
 
@@ -29,6 +32,14 @@ bool stopbottom = false;
 bool kickblue = true;
 bool kickred = false;
 bool autointake = false;
+
+// bool readyLB = false;
+
+// bool scoreLB = false;
+bool putRingInLB = false;
+bool ringWaiting = false;
+
+bool LBempty = true;
 
 
 void intakeStateMachine(void* param) {
@@ -73,7 +84,14 @@ void intakeStateMachine(void* param) {
 
 
                     if (proxValue >= proxThreshold) {
-                        if (((hue >= 1 && hue < 30) || (hue > 330 && hue <= 335)) && kickred) {
+
+                        if ((((hue >= 1 && hue < 30) || (hue > 330 && hue <= 335)) && kickred && readyLB) ){
+                            stateAuto = LB_AUTO;
+                            stateStartTime = currentTime;
+                        }
+
+
+                        else if (((hue >= 1 && hue < 30) || (hue > 330 && hue <= 335)) && kickred) {
                             stateAuto = AUTO_SORTING_RED;
                             stateStartTime = currentTime;
                         } else if (hue >= 150 && hue <= 260 && kickblue) {
@@ -96,6 +114,12 @@ void intakeStateMachine(void* param) {
                     if (lift.get_actual_velocity() >= velocityThreshold) {
                         stateStartTime = 0;
                     }
+                    
+                    // if (readyLB){
+                    //     stateAuto = LB_AUTO;
+                    //     stateStartTime = currentTime;
+                    // }
+
                     break;
 
                 case IntakeUnstuck:
@@ -129,11 +153,50 @@ void intakeStateMachine(void* param) {
                         Intake2.move_voltage(0);
                     }
                     // Return to idle after 800 ms
-                    if (currentTime - stateStartTime >= 800) {
+                    if (currentTime - stateStartTime >= 650) {
                         stateAuto = IntakeNormal;
                         stateStartTime = currentTime;
                     }
                     break;    
+
+                case LB_AUTO:
+
+                if (scoreLB){
+                    LBempty = true;
+                }
+
+                if (LBempty && readyLB && settled) {
+                    ringWaiting = false;
+                    
+                }
+
+                if (readyLB && settled) {
+                    putRingInLB = true;
+
+                }
+
+                if (currentTime - stateStartTime < 240 && !ringWaiting) {
+                    Intake1.move_voltage(normalVoltage);
+                    Intake2.move_voltage(normalVoltage);
+                    ringWaiting = true;
+
+                }
+                else {
+                    Intake1.move_voltage(12000);
+                    Intake2.move_voltage(0);
+                }
+
+                if (downLB) {
+                    LBempty = true;
+                    putRingInLB = false;
+                    ringWaiting = false;
+                    
+                    stateAuto = IntakeNormal;
+                    stateStartTime = 0;
+                }
+                break;
+                    
+
 
                 default:
                     stateAuto = IntakeNormal;

@@ -18,6 +18,16 @@ double integral = 0.0;
 int targetPosition = 10;
 bool notJam = false;
 
+bool settled = false;
+
+
+
+bool readyLB = false;
+
+bool scoreLB = false;
+
+bool downLB = false;
+
 
 // Motor, Encoder, and Controller Instances
 // extern pros::Motor Redriect1;    
@@ -74,12 +84,12 @@ inline void updateStateFromInput() {
 
     
 
-    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) { 
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT) || readyLB) { 
         state = STATE_MID;
-    } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+    } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT) || scoreLB) {
         prevState = state;
         state = STATE_UP;
-    } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
+    } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN) || downLB) {
         state = STATE_DOWN;        
     }  
     else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1 )) {
@@ -193,9 +203,15 @@ inline void RedirectControl() {
         // if (state == STATE_DOWN && (rotationPosition >= deadZoneLower && rotationPosition <= deadZoneUpper)) { 
         //     output = 0;
         // }
+        if (fabs(error) < 1.0) { // Adjust the threshold as needed
+            settled = true;
+        } else {
+            settled = false;
+        }
+
 
        Redriect.move_voltage(output + extrapower);  // Apply the output voltage
- previousError = error;
+       previousError = error;
 
 }
 //}

@@ -533,7 +533,14 @@ revtop = true;
 
 
 	//grab far ring
+
+	// ready LB??
+	
+
+
 	chassis.turnToPoint(25.315, -44.274, globalTimeout, {.forwards = intakeside, .maxSpeed = maxang_v, .minSpeed = maxang_v});// grab score ring on mogo
+	readyLB = true;
+
 	chassis.moveToPoint(25.315, -44.274, globalTimeout, {.forwards = intakeside, .maxSpeed = max_v, .minSpeed = min_v}); // grab ring
 
 	// reverse to mid
@@ -546,6 +553,20 @@ revtop = true;
 	
 	// score held ring on stake
 	chassis.moveToPose(2.00, -60.975, 180, globalTimeout, {.forwards = intakeside, .lead = .4, .maxSpeed = 90, .minSpeed = 10}); // score ring
+
+	readyLB = false;
+	scoreLB = true;
+	pros::delay(2000);
+	
+	chassis.moveToPoint(2.00, -57.975, globalTimeout, {.forwards = intakeside,  .maxSpeed = 100, .minSpeed = 100}); 
+	chassis.waitUntil(2);
+	readyLB = false;
+	chassis.moveToPose(2.00, -60.975, 180, globalTimeout, {.forwards = intakeside, .lead = .4, .maxSpeed = 90, .minSpeed = 10}); // score ring
+
+	scoreLB = true;
+
+
+	
 	///////////////
 	//LB SCORED////
 	//////////////
@@ -555,7 +576,7 @@ revtop = true;
 	// reverse to mid to score 3 rings
 	
 	chassis.moveToPose(0, -47.08, 180, globalTimeout, {.forwards = clampside, .maxSpeed = max_v, .minSpeed = min_v}); // reverse 
-
+	downLB = true;
 	// turn to face 3 rings
 	chassis.turnToPoint(-58.915, -47.08, 1000, {.maxSpeed = maxang_v, .minSpeed = minang_v}); // turn to face 3 ringss maybeeeeeeeeee ad back 20 exitrange
 
